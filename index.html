@@ -42,8 +42,8 @@
     <style>
         /* Custom Styles for nuances not covered by utilities */
         .hero-bg {
-            /* Imagem de estrada/viagem executiva mais abstrata e moderna */
-            background-image: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            /* Imagem de estrada/viagem inspiradora (Substituindo a anterior) */
+            background-image: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.5)), url('https://lh3.googleusercontent.com/gg/AMW1TPr9ThJLSk_6tjYiy6icxxmx_HYQGpTxE9ZsOJKaDpHdjVY0YETo-H9S1rEfDLZSDHaAywjU1nASJHnsdwIrvSi_qXHgjVmiTLE_yTZW4O4juWZVAVTaHv_Q6eH9yUGt4BSQFVyeA3120EMw1on5Z4khAhkAugA-0zeLX6TZ1tAPtLcZkc5w=s1024-rj-mp2');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -158,11 +158,11 @@
     <section id="historia" class="py-24 bg-white">
         <div class="container mx-auto px-6">
             <div class="flex flex-col md:flex-row items-center gap-16">
-                <div class="md:w-1/2 relative">
+                <div class="md:w-1/2 relative flex justify-center">
                     <div class="absolute -top-4 -left-4 w-24 h-24 bg-blue-100 rounded-full z-0"></div>
                     <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-brand-blue/10 rounded-full z-0"></div>
-                    <!-- Imagem de Van Executiva -->
-                    <img src="https://images.unsplash.com/photo-1626569204992-494b95346473?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Van Executiva Moderna" class="rounded-2xl shadow-2xl relative z-10 w-full object-cover h-[500px]">
+                    <!-- Imagem de Van Executiva (Foto Real 1) -->
+                    <img src="https://atagaivota.my.canva.site/images/ba23e0a0309a86646a053d49ba6b3402.png" alt="Van Executiva da Ata Gaivota" class="relative z-10 w-full max-w-md object-contain drop-shadow-2xl hover:scale-105 transition duration-500">
                 </div>
                 <div class="md:w-1/2">
                     <h4 class="text-brand-blue font-bold uppercase tracking-wider mb-2">Nossa História</h4>
@@ -241,6 +241,26 @@
                     <p class="text-slate-600 leading-relaxed">
                         Viagens sob medida para sua família ou grupo de amigos. Escolha o destino e nós cuidamos do transporte exclusivo.
                     </p>
+                </div>
+            </div>
+            
+            <!-- Features Stripe with Real Van Image -->
+            <div class="mt-20 bg-brand-blue rounded-3xl p-8 md:p-12 text-white relative overflow-hidden flex flex-col md:flex-row items-center">
+                <div class="relative z-10 flex-1 text-center md:text-left mb-8 md:mb-0">
+                    <h3 class="font-heading text-3xl font-bold mb-4">Pronto para a sua próxima aventura?</h3>
+                    <p class="text-blue-100 text-lg mb-8">Garanta seu lugar com o conforto e a qualidade da nossa frota executiva.</p>
+                    <a href="https://api.whatsapp.com/send?phone=551334291209" class="bg-white text-brand-blue px-8 py-3 rounded-full font-bold hover:bg-slate-100 transition shadow-lg whitespace-nowrap">
+                        Solicitar Orçamento
+                    </a>
+                </div>
+                <!-- Imagem de Van Executiva (Foto Real 2) -->
+                <div class="flex-1 flex justify-center md:justify-end relative z-10">
+                    <img src="https://atagaivota.my.canva.site/images/bcdb44ef5f5ba2ae117b448daf046cf1.png" alt="Frota Ata Gaivota" class="w-full max-w-md object-contain drop-shadow-xl transform hover:scale-105 transition duration-500">
+                </div>
+                
+                <!-- Background decoration -->
+                <div class="absolute top-0 right-0 opacity-10 text-9xl transform translate-x-10 -translate-y-10 z-0">
+                    <i class="fa-solid fa-route"></i>
                 </div>
             </div>
         </div>
@@ -450,7 +470,7 @@
 
             // UI State: Loading
             generateBtn.disabled = true;
-            generateBtn.innerHTML = '<span>Pensando...</span>';
+            generateBtn.innerHTML = '<span>Listando Atrações...</span>';
             initialState.classList.add('hidden');
             resultContent.classList.add('hidden');
             loadingState.classList.remove('hidden');
@@ -458,12 +478,12 @@
             const prompt = `Você é um guia turístico experiente da agência de viagens 'Ata Gaivota Turismo' especializada em vans executivas. 
             O cliente quer ir para: "${destination}".
             
-            Crie uma resposta curta e convidativa contendo:
-            1. Um parágrafo curto e inspirador sobre por que visitar este lugar com a Ata Gaivota (focando no conforto da van).
-            2. Uma lista HTML (<ul>) com 3 atrações imperdíveis.
-            3. Uma "Dica de Ouro" final.
+            Crie uma resposta direta e focada EXCLUSIVAMENTE em pontos turísticos (NÃO inclua restaurantes ou onde comer), contendo:
+            1. Um parágrafo curto e inspirador sobre o destino.
+            2. Uma lista HTML (<ul>) com as 5 a 8 **Principais Atrações Turísticas** imperdíveis para se visitar.
+            3. Uma "Dica de Ouro" final sobre um passeio específico ou melhor época para ir.
             
-            Use formatação HTML simples como <strong> para destaque e <ul>/<li> para listas. Não use Markdown (nada de asteriscos ** ou #). Seja amigável e use emojis.`;
+            Use formatação HTML simples como <h3> para títulos, <strong> para destaque e <ul>/<li> para listas. Não use Markdown (nada de asteriscos ** ou #). Seja amigável e use emojis.`;
 
             try {
                 const responseData = await callGeminiWithBackoff(prompt);
