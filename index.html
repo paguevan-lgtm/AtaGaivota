@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ata Gaivota Turismo | Conectando Destinos</title>
+    <meta name="description" content="Agência de turismo em Itanhaém. Excursões, fretamentos e viagens personalizadas com segurança e conforto desde 2002.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#2a6ef2',
+                            dark: '#0f172a',
+                            light: '#f8fafc',
+                            accent: '#38bdf8'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles for nuances not covered by utilities */
+        .hero-bg {
+            /* Imagem de estrada/viagem executiva mais abstrata e moderna */
+            background-image: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.7)), url('https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.1) rotate(-5deg);
+            color: #2a6ef2;
+        }
+
+        /* Loading Spinner */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #2a6ef2;
+            width: 20px;
+            height: 20px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .markdown-prose ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .markdown-prose strong {
+            color: #0f172a;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="font-sans text-slate-700 bg-slate-50 antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <!-- Logo Atualizada -->
+            <a href="#" class="flex items-center gap-3 group">
+                <img src="https://atagaivota.my.canva.site/images/7a8a7a458338b94031d0dd58362771e3.svg" alt="Logo Ata Gaivota" class="h-12 w-auto filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0 transition duration-300">
+                <span class="text-xl font-heading font-bold text-white tracking-wider group-hover:text-brand-accent transition duration-300">ATA GAIVOTA</span>
+            </a>
+            
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#inicio" class="text-slate-200 hover:text-white font-medium transition">Início</a>
+                <a href="#historia" class="text-slate-200 hover:text-white font-medium transition">Nossa História</a>
+                <a href="#servicos" class="text-slate-200 hover:text-white font-medium transition">Serviços</a>
+                <a href="#ia-planner" class="text-brand-accent hover:text-white font-medium transition flex items-center gap-1"><i class="fa-solid fa-sparkles"></i> Dicas IA</a>
+                <a href="#contato" class="bg-brand-blue hover:bg-blue-600 text-white px-6 py-2 rounded-full font-bold transition shadow-lg transform hover:-translate-y-0.5">
+                    Fale Conosco
+                </a>
+            </div>
+
+            <!-- Mobile Button -->
+            <button id="mobile-menu-btn" class="md:hidden text-white text-2xl focus:outline-none">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white absolute w-full shadow-xl">
+            <div class="flex flex-col px-6 py-4 space-y-4">
+                <a href="#inicio" class="text-brand-dark font-medium hover:text-brand-blue">Início</a>
+                <a href="#historia" class="text-brand-dark font-medium hover:text-brand-blue">Nossa História</a>
+                <a href="#servicos" class="text-brand-dark font-medium hover:text-brand-blue">Serviços</a>
+                <a href="#ia-planner" class="text-brand-blue font-medium hover:text-brand-dark flex items-center gap-2"><i class="fa-solid fa-sparkles"></i> Dicas IA</a>
+                <a href="#contato" class="text-brand-blue font-bold">Fale Conosco</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-bg h-screen flex items-center relative">
+        <div class="container mx-auto px-6 text-center text-white relative z-10">
+            <span class="block text-brand-accent font-bold tracking-widest uppercase mb-4 animate-fade-in-up">Desde 2002</span>
+            <h1 class="font-heading text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
+                Conectando Destinos,<br>Criando <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Memórias</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-200 mb-10 max-w-2xl mx-auto font-light">
+                Transporte executivo, excursões e viagens personalizadas com o conforto de vans modernas e a segurança que você merece.
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="#servicos" class="bg-white text-brand-blue px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-lg">
+                    Conheça Nossa Frota
+                </a>
+                <a href="https://api.whatsapp.com/send?phone=551334291209" target="_blank" class="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp"></i> Reserve Agora
+                </a>
+            </div>
+        </div>
+        
+        <!-- Scroll Down Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <a href="#historia" class="text-white text-2xl opacity-70 hover:opacity-100">
+                <i class="fa-solid fa-chevron-down"></i>
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="historia" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center gap-16">
+                <div class="md:w-1/2 relative">
+                    <div class="absolute -top-4 -left-4 w-24 h-24 bg-blue-100 rounded-full z-0"></div>
+                    <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-brand-blue/10 rounded-full z-0"></div>
+                    <!-- Imagem de Van Executiva -->
+                    <img src="https://images.unsplash.com/photo-1626569204992-494b95346473?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Van Executiva Moderna" class="rounded-2xl shadow-2xl relative z-10 w-full object-cover h-[500px]">
+                </div>
+                <div class="md:w-1/2">
+                    <h4 class="text-brand-blue font-bold uppercase tracking-wider mb-2">Nossa História</h4>
+                    <h2 class="font-heading text-4xl font-bold text-brand-dark mb-6">Uma jornada que começou com um sonho</h2>
+                    <p class="text-lg text-slate-600 mb-6 leading-relaxed">
+                        A <span class="font-bold text-brand-blue">ATA GAIVOTA</span> começou como um sonho compartilhado por dois irmãos apaixonados por viagens e aventuras. Em 2002, eles decidiram transformar essa paixão em realidade, fundando uma agência de turismo com um objetivo claro: oferecer viagens confortáveis e seguras.
+                    </p>
+                    <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                        Com um compromisso inabalável com a qualidade, modernizamos nossa frota focando no transporte executivo. Hoje, oferecemos experiências premium com vans de última geração para destinos em todo o Brasil.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="flex items-start gap-4">
+                            <div class="bg-blue-100 p-3 rounded-lg text-brand-blue">
+                                <i class="fa-solid fa-shield-heart text-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-brand-dark">Segurança</h5>
+                                <p class="text-sm text-slate-500">Veículos novos e segurados.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <div class="bg-blue-100 p-3 rounded-lg text-brand-blue">
+                                <i class="fa-solid fa-couch text-xl"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-brand-dark">Conforto Executivo</h5>
+                                <p class="text-sm text-slate-500">Bancos reclináveis e Ar condicionado.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="servicos" class="py-24 bg-slate-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h4 class="text-brand-blue font-bold uppercase tracking-wider mb-2">O que oferecemos</h4>
+                <h2 class="font-heading text-4xl font-bold text-brand-dark">Nossos Serviços</h2>
+                <div class="w-24 h-1 bg-brand-blue mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="service-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 border-b-4 border-transparent hover:border-brand-blue group">
+                    <div class="service-icon text-slate-300 text-5xl mb-6 transition duration-300">
+                        <!-- Icone de Shuttle Van -->
+                        <i class="fa-solid fa-van-shuttle"></i>
+                    </div>
+                    <h3 class="font-heading text-2xl font-bold text-brand-dark mb-4 group-hover:text-brand-blue transition">Excursões</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Viagens planejadas com vans executivas para os melhores destinos turísticos. Roteiros completos para pequenos grupos.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="service-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 border-b-4 border-transparent hover:border-brand-blue group">
+                    <div class="service-icon text-slate-300 text-5xl mb-6 transition duration-300">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <h3 class="font-heading text-2xl font-bold text-brand-dark mb-4 group-hover:text-brand-blue transition">Fretamento Executivo</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Aluguel de vans com motorista para eventos corporativos, traslados de aeroporto, casamentos e logística empresarial.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="service-card bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 border-b-4 border-transparent hover:border-brand-blue group">
+                    <div class="service-icon text-slate-300 text-5xl mb-6 transition duration-300">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <h3 class="font-heading text-2xl font-bold text-brand-dark mb-4 group-hover:text-brand-blue transition">Personalizados</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Viagens sob medida para sua família ou grupo de amigos. Escolha o destino e nós cuidamos do transporte exclusivo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gemini AI Travel Planner Section -->
+    <section id="ia-planner" class="py-24 relative overflow-hidden bg-brand-dark">
+        <!-- Abstract Background -->
+        <div class="absolute inset-0 z-0 opacity-20" style="background-image: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center;"></div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 text-white">
+                    <div class="inline-block bg-brand-blue/20 text-brand-accent px-4 py-1 rounded-full text-sm font-bold mb-4 border border-brand-accent/30">
+                        <i class="fa-solid fa-sparkles mr-2"></i> Powered by Gemini AI
+                    </div>
+                    <h2 class="font-heading text-4xl md:text-5xl font-bold mb-6">Planeje sua próxima aventura com IA</h2>
+                    <p class="text-lg text-slate-300 mb-8 leading-relaxed">
+                        Não sabe para onde ir ou o que fazer? Digite um destino e nossa inteligência artificial criará sugestões de passeios imperdíveis e dicas exclusivas para você curtir com a Ata Gaivota.
+                    </p>
+                    
+                    <div class="bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10 shadow-2xl">
+                        <label for="destinationInput" class="block text-slate-300 text-sm font-bold mb-2">Para onde você quer ir?</label>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <input type="text" id="destinationInput" placeholder="Ex: Campos do Jordão, Aparecida, Rio de Janeiro..." class="flex-grow px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition">
+                            <button onclick="generateTravelTips()" id="generateBtn" class="bg-brand-blue hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold transition shadow-lg flex items-center justify-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span>Descobrir ✨</span>
+                            </button>
+                        </div>
+                        <p class="text-xs text-slate-400 mt-3"><i class="fa-solid fa-circle-info mr-1"></i> Sugestões geradas instantaneamente para sua inspiração.</p>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2 w-full">
+                    <div id="resultContainer" class="bg-white rounded-2xl p-8 shadow-2xl min-h-[300px] flex flex-col items-center justify-center text-center transition-all duration-500 opacity-90">
+                        <!-- Initial State -->
+                        <div id="initialState" class="text-slate-400">
+                            <i class="fa-solid fa-map-location-dot text-6xl mb-4 text-slate-200"></i>
+                            <h3 class="text-xl font-bold text-slate-600 mb-2">Seu roteiro aparecerá aqui</h3>
+                            <p class="text-sm">Digite um destino ao lado para começar a mágica.</p>
+                        </div>
+
+                        <!-- Loading State (Hidden by default) -->
+                        <div id="loadingState" class="hidden">
+                            <div class="loader mb-4 mx-auto"></div>
+                            <p class="text-brand-blue font-bold animate-pulse">Consultando nossos guias virtuais...</p>
+                        </div>
+
+                        <!-- Result State (Hidden by default) -->
+                        <div id="resultContent" class="hidden text-left w-full markdown-prose">
+                            <!-- Content will be injected here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact & Info Section -->
+    <section id="contato" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row gap-16">
+                <!-- Contact Info -->
+                <div class="lg:w-1/3 space-y-8">
+                    <div>
+                        <h4 class="text-brand-blue font-bold uppercase tracking-wider mb-2">Fale Conosco</h4>
+                        <h2 class="font-heading text-4xl font-bold text-brand-dark mb-6">Entre em contato</h2>
+                        <p class="text-slate-600">Atendimento presencial ou através de nossos canais digitais.</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-brand-blue text-xl flex-shrink-0">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-brand-dark text-lg">Endereço</h5>
+                                <p class="text-slate-600">Av. Flacides Ferreira, 1320<br>Gaivota, Itanhaém - SP</p>
+                                <a href="https://maps.app.goo.gl/sEnPDkqf5WoANZBu6" target="_blank" class="text-brand-blue text-sm font-semibold hover:underline mt-1 inline-block">Ver no mapa &rarr;</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-brand-blue text-xl flex-shrink-0">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-brand-dark text-lg">Telefones (WhatsApp)</h5>
+                                <p class="text-slate-600 hover:text-brand-blue transition"><a href="tel:+551334291209">(13) 3429-1209</a></p>
+                                <p class="text-slate-600 hover:text-brand-blue transition"><a href="tel:+551334292755">(13) 3429-2755</a></p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-brand-blue text-xl flex-shrink-0">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-brand-dark text-lg">Email</h5>
+                                <p class="text-slate-600 break-all"><a href="mailto:atagaivota981@gmail.com">atagaivota981@gmail.com</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-6 border-t border-slate-100">
+                        <h5 class="font-bold text-brand-dark mb-4">Redes Sociais</h5>
+                        <div class="flex gap-4">
+                            <a href="https://www.facebook.com/profile.php?id=61557971471078" target="_blank" class="w-10 h-10 bg-[#1877F2] text-white rounded-full flex items-center justify-center hover:opacity-90 transition">
+                                <i class="fa-brands fa-facebook-f"></i>
+                            </a>
+                            <a href="https://www.instagram.com/atagaivota/" target="_blank" class="w-10 h-10 bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white rounded-full flex items-center justify-center hover:opacity-90 transition">
+                                <i class="fa-brands fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map / Policies -->
+                <div class="lg:w-2/3">
+                    <div class="bg-slate-50 p-2 rounded-2xl h-full min-h-[400px] shadow-inner relative overflow-hidden group">
+                        <!-- Placeholder for Map - Using an image for design purposes, normally would be an iframe -->
+                        <div class="absolute inset-0 bg-slate-200">
+                             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3643.0858183626245!2d-46.7454239238381!3d-24.06328327845701!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce276b6b772439%3A0x6a0a049103c8046!2sAv.%20Fl%C3%A1cides%20Ferreira%2C%201320%20-%20Gaivota%2C%20Itanha%C3%A9m%20-%20SP%2C%2011740-000!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="filter grayscale hover:grayscale-0 transition duration-700"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Policies Stripe -->
+    <section class="bg-brand-dark py-12 border-b border-slate-800">
+        <div class="container mx-auto px-6 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-6">
+            <div>
+                <h3 class="text-white font-bold text-xl mb-2"><i class="fa-solid fa-file-contract text-brand-blue mr-2"></i> Políticas e Termos</h3>
+                <p class="text-slate-400 text-sm max-w-lg">
+                    Prezamos pela transparência. Consulte nossas políticas de cancelamento, termos e condições de uso antes de reservar sua viagem.
+                </p>
+            </div>
+            <a href="#" class="text-white border border-slate-600 px-6 py-2 rounded-lg text-sm hover:bg-slate-800 transition">Ler Termos Completos</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-brand-dark text-slate-400 py-10">
+        <div class="container mx-auto px-6 text-center">
+            <div class="mb-6 flex justify-center items-center gap-3">
+                <!-- Logo Footer -->
+                <img src="https://atagaivota.my.canva.site/images/7a8a7a458338b94031d0dd58362771e3.svg" alt="Logo Ata Gaivota" class="h-10 w-auto filter brightness-0 invert opacity-80">
+                <span class="text-2xl font-heading font-bold text-white tracking-wider">
+                    ATA GAIVOTA
+                </span>
+            </div>
+            <p class="text-sm mb-6">
+                © 2026 Ata Gaivota Turismo. Todos os direitos reservados.
+            </p>
+            <div class="text-xs text-slate-600">
+                <p>CNPJ e licenças aplicáveis disponíveis sob consulta.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const navbar = document.getElementById('navbar');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu on link click
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('bg-brand-dark', 'shadow-md', 'py-2');
+                navbar.classList.remove('py-4');
+            } else {
+                navbar.classList.remove('bg-brand-dark', 'shadow-md', 'py-2');
+                navbar.classList.add('py-4');
+            }
+        });
+
+        // --- Gemini AI Integration ---
+        const apiKey = ""; // Will be provided by environment
+
+        async function generateTravelTips() {
+            const input = document.getElementById('destinationInput');
+            const destination = input.value.trim();
+            const generateBtn = document.getElementById('generateBtn');
+            const initialState = document.getElementById('initialState');
+            const loadingState = document.getElementById('loadingState');
+            const resultContent = document.getElementById('resultContent');
+
+            if (!destination) {
+                alert("Por favor, digite um destino para pesquisar!");
+                return;
+            }
+
+            // UI State: Loading
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span>Pensando...</span>';
+            initialState.classList.add('hidden');
+            resultContent.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+
+            const prompt = `Você é um guia turístico experiente da agência de viagens 'Ata Gaivota Turismo' especializada em vans executivas. 
+            O cliente quer ir para: "${destination}".
+            
+            Crie uma resposta curta e convidativa contendo:
+            1. Um parágrafo curto e inspirador sobre por que visitar este lugar com a Ata Gaivota (focando no conforto da van).
+            2. Uma lista HTML (<ul>) com 3 atrações imperdíveis.
+            3. Uma "Dica de Ouro" final.
+            
+            Use formatação HTML simples como <strong> para destaque e <ul>/<li> para listas. Não use Markdown (nada de asteriscos ** ou #). Seja amigável e use emojis.`;
+
+            try {
+                const responseData = await callGeminiWithBackoff(prompt);
+                const text = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    resultContent.innerHTML = text;
+                    loadingState.classList.add('hidden');
+                    resultContent.classList.remove('hidden');
+                } else {
+                    throw new Error("Sem resposta da IA");
+                }
+
+            } catch (error) {
+                console.error("Erro na IA:", error);
+                resultContent.innerHTML = `<p class="text-red-500 text-center">Ops! Nossos guias virtuais estão ocupados. Tente novamente em instantes.</p>`;
+                loadingState.classList.add('hidden');
+                resultContent.classList.remove('hidden');
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<span>Descobrir ✨</span>';
+            }
+        }
+
+        async function callGeminiWithBackoff(prompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429) { // Too Many Requests
+                            throw new Error('Rate limit');
+                        }
+                        throw new Error(`API Error: ${response.statusText}`);
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    if (i === 4) throw error; // Rethrow after last attempt
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2; // Exponential backoff
+                }
+            }
+        }
+    </script>
+</body>
+</html>
