@@ -107,13 +107,14 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
+            pointer-events: none; /* CORREÇÃO: Permite cliques através da área vazia */
         }
 
         .chat-window {
             width: 90vw;
             max-width: 350px;
             height: 450px;
-            max-height: 70vh;
+            max-height: 60vh; /* Ajuste para não cobrir teclado no mobile */
             background: white;
             border-radius: 1rem;
             box-shadow: 0 10px 25px rgba(0,0,0,0.2);
@@ -124,14 +125,19 @@
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             opacity: 0;
             transform: scale(0.9) translateY(20px);
-            pointer-events: none;
+            pointer-events: none; /* Mantém fechado não clicável */
             margin-bottom: 1rem;
         }
 
         .chat-window.open {
             opacity: 1;
             transform: scale(1) translateY(0);
-            pointer-events: all;
+            pointer-events: all; /* CORREÇÃO: Torna clicável apenas quando aberto */
+        }
+
+        /* Botão do chat sempre clicável */
+        .chat-btn-container {
+            pointer-events: auto;
         }
 
         .chat-messages {
@@ -236,7 +242,7 @@
 
     <!-- Navigation -->
     <nav class="fixed w-full z-50 transition-all duration-300" id="navbar">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center relative">
             <!-- Logo Atualizada -->
             <a href="#" class="flex items-center gap-3 group">
                 <img src="https://atagaivota.my.canva.site/images/7a8a7a458338b94031d0dd58362771e3.svg" alt="Logo Ata Gaivota" class="h-10 md:h-12 w-auto filter brightness-0 invert group-hover:brightness-100 group-hover:invert-0 transition duration-300">
@@ -256,20 +262,18 @@
             </div>
 
             <!-- Mobile Button -->
-            <button id="mobile-menu-btn" class="md:hidden text-white text-2xl focus:outline-none">
+            <button id="mobile-menu-btn" class="md:hidden text-white text-2xl focus:outline-none p-2">
                 <i class="fa-solid fa-bars"></i>
             </button>
-        </div>
 
-        <!-- Mobile Menu Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white absolute w-full shadow-xl">
-            <div class="flex flex-col px-6 py-4 space-y-4">
-                <a href="#inicio" class="text-brand-dark font-medium hover:text-brand-blue">Início</a>
-                <a href="#historia" class="text-brand-dark font-medium hover:text-brand-blue">História</a>
-                <a href="#servicos" class="text-brand-dark font-medium hover:text-brand-blue">Serviços</a>
-                <a href="#frota" class="text-brand-dark font-medium hover:text-brand-blue">Frota</a>
-                <a href="#ia-planner" class="text-brand-blue font-medium hover:text-brand-dark flex items-center gap-2"><i class="fa-solid fa-sparkles"></i> Dicas IA</a>
-                <a href="#contato" class="text-brand-blue font-bold">Fale Conosco</a>
+            <!-- Mobile Menu Dropdown (Movido para dentro da NAV e corrigido posicionamento) -->
+            <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 w-full bg-white shadow-xl border-t border-gray-100 flex flex-col py-2 z-50">
+                <a href="#inicio" class="block px-6 py-3 text-brand-dark font-medium hover:bg-slate-50 hover:text-brand-blue border-b border-gray-50">Início</a>
+                <a href="#historia" class="block px-6 py-3 text-brand-dark font-medium hover:bg-slate-50 hover:text-brand-blue border-b border-gray-50">História</a>
+                <a href="#servicos" class="block px-6 py-3 text-brand-dark font-medium hover:bg-slate-50 hover:text-brand-blue border-b border-gray-50">Serviços</a>
+                <a href="#frota" class="block px-6 py-3 text-brand-dark font-medium hover:bg-slate-50 hover:text-brand-blue border-b border-gray-50">Frota</a>
+                <a href="#ia-planner" class="block px-6 py-3 text-brand-blue font-medium hover:bg-slate-50 border-b border-gray-50 flex items-center gap-2"><i class="fa-solid fa-sparkles"></i> Dicas IA</a>
+                <a href="#contato" class="block px-6 py-3 text-brand-blue font-bold hover:bg-slate-50">Fale Conosco</a>
             </div>
         </div>
     </nav>
@@ -551,7 +555,7 @@
                 <!-- Card 1 -->
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500 group reveal delay-100 hover:-translate-y-2">
                     <div class="h-64 overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Campos do Jordão" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                        <img src="https://guiasdecampos.com.br/lovable-uploads/71447139-9c75-4e9b-a7da-eda20a1e990c.png" alt="Campos do Jordão" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                         <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-6">
                             <h3 class="text-white font-bold text-xl">Campos do Jordão</h3>
                         </div>
@@ -564,7 +568,8 @@
                 <!-- Card 2 -->
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500 group reveal delay-200 hover:-translate-y-2">
                     <div class="h-64 overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1572979234676-474029272379?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Aparecida do Norte" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                        <!-- Imagem Atualizada para Aparecida/Santuário -->
+                        <img src="https://www.metropoletur.com.br/wp-content/uploads/bfi_thumb/16195889_378707732487984_530238101411776718_n-p2xlbs9gggeuis174t08qcpu1iab2tbi44ye511uhg.jpg" alt="Aparecida do Norte" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                         <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-6">
                             <h3 class="text-white font-bold text-xl">Aparecida</h3>
                         </div>
@@ -577,13 +582,14 @@
                 <!-- Card 3 -->
                 <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition duration-500 group reveal delay-300 hover:-translate-y-2">
                     <div class="h-64 overflow-hidden relative">
-                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Litoral" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
+                        <!-- Imagem Atualizada para Litoral -->
+                        <img src="https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/06/dc/55/van-executiva.jpg?w=1200&h=-1&s=1" alt="Litoral" class="w-full h-full object-cover transition duration-700 group-hover:scale-110">
                         <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-6">
                             <h3 class="text-white font-bold text-xl">Praias & Litoral</h3>
                         </div>
                     </div>
                     <div class="p-6">
-                        <p class="text-slate-600 text-sm mb-4">De Ubatuba a Ilhabela, levamos você para os melhores refúgios de sol e mar.</p>
+                        <p class="text-slate-600 text-sm mb-4">De Praia Grande a Peruibe, levamos você para os melhores refúgios de sol e mar.</p>
                         <a href="#contato" class="text-brand-blue font-bold text-sm hover:underline flex items-center gap-2 group-hover:gap-3 transition-all">Consultar Saídas <i class="fa-solid fa-arrow-right"></i></a>
                     </div>
                 </div>
@@ -869,7 +875,7 @@
                         <p class="text-xs text-blue-100 flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full inline-block"></span> Online</p>
                     </div>
                 </div>
-                <button onclick="toggleChat()" class="text-white hover:text-blue-100"><i class="fa-solid fa-times"></i></button>
+                <button onclick="toggleChat()" class="text-white hover:text-blue-100 p-2"><i class="fa-solid fa-times"></i></button>
             </div>
             <div id="chatMessages" class="chat-messages">
                 <div class="message bot">
@@ -883,9 +889,12 @@
                 </button>
             </div>
         </div>
-        <button onclick="toggleChat()" class="bg-brand-blue hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition transform hover:scale-110 btn-press">
-            <i class="fa-solid fa-comment-dots"></i>
-        </button>
+        <!-- Botão com classe container para ser clicável -->
+        <div class="chat-btn-container">
+            <button onclick="toggleChat()" class="bg-brand-blue hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition transform hover:scale-110 btn-press">
+                <i class="fa-solid fa-comment-dots"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Scripts -->
@@ -895,8 +904,16 @@
         const menu = document.getElementById('mobile-menu');
         const navbar = document.getElementById('navbar');
 
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Previne cliques acidentais
             menu.classList.toggle('hidden');
+            
+            // Adiciona fundo branco na navbar quando menu abre, se estiver no topo transparente
+            if (!menu.classList.contains('hidden') && window.scrollY <= 50) {
+                navbar.classList.add('bg-brand-dark');
+            } else if (window.scrollY <= 50) {
+                navbar.classList.remove('bg-brand-dark');
+            }
         });
 
         // Close mobile menu on link click
@@ -904,6 +921,13 @@
             link.addEventListener('click', () => {
                 menu.classList.add('hidden');
             });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target) && !btn.contains(e.target) && !menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+            }
         });
 
         // Navbar Scroll Effect
