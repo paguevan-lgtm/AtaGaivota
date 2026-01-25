@@ -42,8 +42,8 @@
     <style>
         /* Custom Styles for nuances not covered by utilities */
         .hero-bg {
-            /* Imagem de estrada/viagem inspiradora (Substituindo a anterior) */
-            background-image: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.5)), url('https://lh3.googleusercontent.com/gg/AMW1TPr9ThJLSk_6tjYiy6icxxmx_HYQGpTxE9ZsOJKaDpHdjVY0YETo-H9S1rEfDLZSDHaAywjU1nASJHnsdwIrvSi_qXHgjVmiTLE_yTZW4O4juWZVAVTaHv_Q6eH9yUGt4BSQFVyeA3120EMw1on5Z4khAhkAugA-0zeLX6TZ1tAPtLcZkc5w=s1024-rj-mp2');
+            /* Imagem de estrada/viagem com Van */
+            background-image: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.5)), url('https://images.unsplash.com/photo-1557223562-6c77ef16210f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -84,6 +84,106 @@
             color: #0f172a;
             font-weight: 700;
         }
+
+        /* FAQ Accordion Styles */
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary ~ * {
+            animation: sweep .3s ease-in-out;
+        }
+        @keyframes sweep {
+            0%    {opacity: 0; margin-top: -10px}
+            100%  {opacity: 1; margin-top: 0px}
+        }
+
+        /* Chat Widget Styles */
+        .chat-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .chat-window {
+            width: 350px;
+            height: 450px;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform-origin: bottom right;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            pointer-events: none;
+            margin-bottom: 1rem;
+        }
+
+        .chat-window.open {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .message.bot {
+            background-color: white;
+            color: #334155;
+            border-bottom-left-radius: 0.25rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            align-self: flex-start;
+        }
+
+        .message.user {
+            background-color: #2a6ef2;
+            color: white;
+            border-bottom-right-radius: 0.25rem;
+            align-self: flex-end;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #cbd5e1;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+            margin: 0 1px;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
     </style>
 </head>
 <body class="font-sans text-slate-700 bg-slate-50 antialiased">
@@ -100,8 +200,9 @@
             <!-- Desktop Menu -->
             <div class="hidden md:flex space-x-8 items-center">
                 <a href="#inicio" class="text-slate-200 hover:text-white font-medium transition">Início</a>
-                <a href="#historia" class="text-slate-200 hover:text-white font-medium transition">Nossa História</a>
+                <a href="#historia" class="text-slate-200 hover:text-white font-medium transition">História</a>
                 <a href="#servicos" class="text-slate-200 hover:text-white font-medium transition">Serviços</a>
+                <a href="#frota" class="text-slate-200 hover:text-white font-medium transition">Frota</a>
                 <a href="#ia-planner" class="text-brand-accent hover:text-white font-medium transition flex items-center gap-1"><i class="fa-solid fa-sparkles"></i> Dicas IA</a>
                 <a href="#contato" class="bg-brand-blue hover:bg-blue-600 text-white px-6 py-2 rounded-full font-bold transition shadow-lg transform hover:-translate-y-0.5">
                     Fale Conosco
@@ -118,8 +219,9 @@
         <div id="mobile-menu" class="hidden md:hidden bg-white absolute w-full shadow-xl">
             <div class="flex flex-col px-6 py-4 space-y-4">
                 <a href="#inicio" class="text-brand-dark font-medium hover:text-brand-blue">Início</a>
-                <a href="#historia" class="text-brand-dark font-medium hover:text-brand-blue">Nossa História</a>
+                <a href="#historia" class="text-brand-dark font-medium hover:text-brand-blue">História</a>
                 <a href="#servicos" class="text-brand-dark font-medium hover:text-brand-blue">Serviços</a>
+                <a href="#frota" class="text-brand-dark font-medium hover:text-brand-blue">Frota</a>
                 <a href="#ia-planner" class="text-brand-blue font-medium hover:text-brand-dark flex items-center gap-2"><i class="fa-solid fa-sparkles"></i> Dicas IA</a>
                 <a href="#contato" class="text-brand-blue font-bold">Fale Conosco</a>
             </div>
@@ -137,7 +239,7 @@
                 Transporte executivo, excursões e viagens personalizadas com o conforto de vans modernas e a segurança que você merece.
             </p>
             <div class="flex flex-col md:flex-row gap-4 justify-center">
-                <a href="#servicos" class="bg-white text-brand-blue px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-lg">
+                <a href="#frota" class="bg-white text-brand-blue px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-100 transition shadow-lg">
                     Conheça Nossa Frota
                 </a>
                 <a href="https://api.whatsapp.com/send?phone=551334291209" target="_blank" class="border-2 border-white text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/10 transition flex items-center justify-center gap-2">
@@ -199,6 +301,73 @@
         </div>
     </section>
 
+    <!-- Stats Section -->
+    <section class="bg-brand-blue py-12 text-white">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-blue-400/30">
+                <div>
+                    <div class="text-4xl font-bold font-heading mb-1">22+</div>
+                    <div class="text-sm text-blue-100">Anos de Estrada</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold font-heading mb-1">5k+</div>
+                    <div class="text-sm text-blue-100">Viagens Realizadas</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold font-heading mb-1">100%</div>
+                    <div class="text-sm text-blue-100">Segurança</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold font-heading mb-1">15+</div>
+                    <div class="text-sm text-blue-100">Destinos Fixos</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section (NOVO) -->
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-6 text-center">
+            <div class="mb-16">
+                <h4 class="text-brand-blue font-bold uppercase tracking-wider mb-2">Simples e Rápido</h4>
+                <h2 class="font-heading text-4xl font-bold text-brand-dark">Do Orçamento ao Destino</h2>
+                <div class="w-24 h-1 bg-brand-blue mx-auto mt-4 rounded-full"></div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row justify-center items-center gap-12 relative">
+                <!-- Connecting Line (Desktop only) -->
+                <div class="hidden md:block absolute top-1/2 left-20 right-20 h-1 bg-slate-100 -z-10 -translate-y-8"></div>
+
+                <!-- Step 1 -->
+                <div class="flex flex-col items-center group">
+                    <div class="w-20 h-20 bg-white text-brand-dark rounded-full flex items-center justify-center text-3xl shadow-xl mb-6 border-4 border-slate-50 group-hover:border-brand-blue transition duration-300">
+                        <i class="fa-solid fa-comments"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-brand-dark mb-2">1. Entre em Contato</h3>
+                    <p class="text-slate-600 text-sm max-w-xs">Chame no WhatsApp ou envie um e-mail com os detalhes da sua viagem.</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flex flex-col items-center group">
+                    <div class="w-20 h-20 bg-brand-blue text-white rounded-full flex items-center justify-center text-3xl shadow-xl mb-6 border-4 border-white group-hover:scale-110 transition duration-300">
+                        <i class="fa-solid fa-calendar-check"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-brand-dark mb-2">2. Personalização</h3>
+                    <p class="text-slate-600 text-sm max-w-xs">Definimos o roteiro, veículo ideal e condições de pagamento facilitadas.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flex flex-col items-center group">
+                    <div class="w-20 h-20 bg-white text-brand-accent rounded-full flex items-center justify-center text-3xl shadow-xl mb-6 border-4 border-slate-50 group-hover:border-brand-accent transition duration-300">
+                        <i class="fa-solid fa-van-shuttle"></i>
+                    </div>
+                    <h3 class="font-bold text-xl text-brand-dark mb-2">3. Boa Viagem!</h3>
+                    <p class="text-slate-600 text-sm max-w-xs">Nosso motorista busca você no local combinado. Aproveite o passeio!</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Services Section -->
     <section id="servicos" class="py-24 bg-slate-50">
         <div class="container mx-auto px-6">
@@ -243,24 +412,137 @@
                     </p>
                 </div>
             </div>
-            
-            <!-- Features Stripe with Real Van Image -->
-            <div class="mt-20 bg-brand-blue rounded-3xl p-8 md:p-12 text-white relative overflow-hidden flex flex-col md:flex-row items-center">
-                <div class="relative z-10 flex-1 text-center md:text-left mb-8 md:mb-0">
-                    <h3 class="font-heading text-3xl font-bold mb-4">Pronto para a sua próxima aventura?</h3>
-                    <p class="text-blue-100 text-lg mb-8">Garanta seu lugar com o conforto e a qualidade da nossa frota executiva.</p>
-                    <a href="https://api.whatsapp.com/send?phone=551334291209" class="bg-white text-brand-blue px-8 py-3 rounded-full font-bold hover:bg-slate-100 transition shadow-lg whitespace-nowrap">
-                        Solicitar Orçamento
-                    </a>
+        </div>
+    </section>
+
+    <!-- Fleet Section -->
+    <section class="py-24 bg-white" id="frota">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2">
+                    <img src="https://atagaivota.my.canva.site/images/bcdb44ef5f5ba2ae117b448daf046cf1.png" alt="Interior da Van" class="rounded-2xl shadow-2xl w-full object-cover">
                 </div>
-                <!-- Imagem de Van Executiva (Foto Real 2) -->
-                <div class="flex-1 flex justify-center md:justify-end relative z-10">
-                    <img src="https://atagaivota.my.canva.site/images/bcdb44ef5f5ba2ae117b448daf046cf1.png" alt="Frota Ata Gaivota" class="w-full max-w-md object-contain drop-shadow-xl transform hover:scale-105 transition duration-500">
+                <div class="lg:w-1/2">
+                    <h4 class="text-brand-blue font-bold uppercase tracking-wider mb-2">Nossa Frota</h4>
+                    <h2 class="font-heading text-4xl font-bold text-brand-dark mb-6">Conforto de Primeira Classe</h2>
+                    <p class="text-slate-600 mb-8">
+                        Nossas vans executivas são equipadas para garantir que sua viagem seja tão prazerosa quanto o destino. Realizamos manutenção rigorosa e higienização completa antes de cada saída.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                            <i class="fa-solid fa-snowflake text-brand-blue text-xl"></i>
+                            <span class="font-medium text-slate-700">Ar Climatizado</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                            <i class="fa-solid fa-wifi text-brand-blue text-xl"></i>
+                            <span class="font-medium text-slate-700">Wi-Fi a Bordo</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                            <i class="fa-solid fa-chair text-brand-blue text-xl"></i>
+                            <span class="font-medium text-slate-700">Bancos Reclináveis</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                            <i class="fa-solid fa-tv text-brand-blue text-xl"></i>
+                            <span class="font-medium text-slate-700">TV e Multimídia</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                            <i class="fa-solid fa-suitcase text-brand-blue text-xl"></i>
+                            <span class="font-medium text-slate-700">Porta-malas Amplo</span>
+                        </div>
+                        <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                            <i class="fa-solid fa-plug text-brand-blue text-xl"></i>
+                            <span class="font-medium text-slate-700">Tomadas USB</span>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- Background decoration -->
-                <div class="absolute top-0 right-0 opacity-10 text-9xl transform translate-x-10 -translate-y-10 z-0">
-                    <i class="fa-solid fa-route"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Corporate & Events Section (NOVO) -->
+    <section class="relative py-24 bg-brand-dark overflow-hidden">
+        <div class="absolute inset-0 z-0 opacity-30" style="background-image: url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); background-size: cover; background-position: center;"></div>
+        <div class="container mx-auto px-6 relative z-10 text-white text-center">
+            <div class="inline-block bg-brand-accent/20 text-brand-accent px-4 py-1 rounded-full text-sm font-bold mb-4 border border-brand-accent/30">
+                <i class="fa-solid fa-briefcase mr-2"></i> Soluções B2B
+            </div>
+            <h2 class="font-heading text-4xl font-bold mb-6">Soluções para Empresas e Eventos</h2>
+            <p class="text-lg text-slate-300 mb-10 max-w-2xl mx-auto">
+                Transporte seus colaboradores, convidados ou equipe com segurança e pontualidade. Oferecemos pacotes especiais para logística de eventos e contratos mensais.
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-6">
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 hover:bg-white/20 transition group w-full md:w-1/3">
+                    <i class="fa-solid fa-building text-3xl text-brand-accent mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-xl mb-2">Transporte Corporativo</h3>
+                    <p class="text-sm text-slate-300">Fretamento contínuo para funcionários e transporte para reuniões externas e convenções.</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 hover:bg-white/20 transition group w-full md:w-1/3">
+                    <i class="fa-solid fa-champagne-glasses text-3xl text-brand-accent mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-xl mb-2">Casamentos e Festas</h3>
+                    <p class="text-sm text-slate-300">Leve seus convidados com conforto e garanta que todos cheguem seguros à celebração.</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 hover:bg-white/20 transition group w-full md:w-1/3">
+                    <i class="fa-solid fa-plane-departure text-3xl text-brand-accent mb-4 group-hover:scale-110 transition"></i>
+                    <h3 class="font-bold text-xl mb-2">Transfers e Aeroportos</h3>
+                    <p class="text-sm text-slate-300">Receptivo pontual em aeroportos (GRU/CGH/VCP) e portos para grupos de todos os tamanhos.</p>
+                </div>
+            </div>
+            <div class="mt-10">
+                <a href="https://api.whatsapp.com/send?phone=551334291209" target="_blank" class="inline-block bg-brand-blue hover:bg-blue-600 text-white px-8 py-3 rounded-full font-bold transition shadow-lg transform hover:-translate-y-1">
+                    Solicitar Orçamento Empresarial
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Destinations Section -->
+    <section class="py-24 bg-slate-50" id="destinos">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-heading text-4xl font-bold text-brand-dark">Destinos Favoritos</h2>
+                <p class="text-slate-600 mt-4">Alguns dos lugares mais procurados pelos nossos passageiros.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition group">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Campos do Jordão" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-6">
+                            <h3 class="text-white font-bold text-xl">Campos do Jordão</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-slate-600 text-sm mb-4">A Suíça brasileira. Clima frio, arquitetura europeia e gastronomia incrível.</p>
+                        <a href="#contato" class="text-brand-blue font-bold text-sm hover:underline flex items-center gap-2">Consultar Saídas <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition group">
+                    <div class="h-64 overflow-hidden relative">
+                        <!-- Imagem Atualizada para Aparecida/Santuário -->
+                        <img src="https://images.unsplash.com/photo-1572979234676-474029272379?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Aparecida do Norte" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-6">
+                            <h3 class="text-white font-bold text-xl">Aparecida</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-slate-600 text-sm mb-4">O maior centro de peregrinação religiosa da América Latina. Fé e devoção.</p>
+                        <a href="#contato" class="text-brand-blue font-bold text-sm hover:underline flex items-center gap-2">Consultar Saídas <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition group">
+                    <div class="h-64 overflow-hidden relative">
+                        <!-- Imagem Atualizada para Litoral -->
+                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Litoral" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/70 to-transparent p-6">
+                            <h3 class="text-white font-bold text-xl">Praias & Litoral</h3>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-slate-600 text-sm mb-4">De Ubatuba a Ilhabela, levamos você para os melhores refúgios de sol e mar.</p>
+                        <a href="#contato" class="text-brand-blue font-bold text-sm hover:underline flex items-center gap-2">Consultar Saídas <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -275,7 +557,7 @@
             <div class="flex flex-col lg:flex-row items-center gap-12">
                 <div class="lg:w-1/2 text-white">
                     <div class="inline-block bg-brand-blue/20 text-brand-accent px-4 py-1 rounded-full text-sm font-bold mb-4 border border-brand-accent/30">
-                        <i class="fa-solid fa-sparkles mr-2"></i> Powered by Gemini AI
+                        <i class="fa-solid fa-sparkles mr-2"></i> Powered by ATA GAIVOTA
                     </div>
                     <h2 class="font-heading text-4xl md:text-5xl font-bold mb-6">Planeje sua próxima aventura com IA</h2>
                     <p class="text-lg text-slate-300 mb-8 leading-relaxed">
@@ -315,6 +597,214 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gemini AI Packing Assistant Section -->
+    <section id="packing-assistant" class="py-24 bg-slate-50 relative border-t border-slate-200">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <div class="inline-block bg-brand-blue/10 text-brand-blue px-4 py-1 rounded-full text-sm font-bold mb-4 border border-brand-blue/20">
+                    <i class="fa-solid fa-suitcase-rolling mr-2"></i> Novo Recurso
+                </div>
+                <h2 class="font-heading text-3xl md:text-4xl font-bold text-brand-dark">Assistente de Bagagem</h2>
+                <p class="text-slate-600 mt-4 max-w-2xl mx-auto">Vai viajar e não sabe o que levar? Nossa inteligência artificial monta a lista perfeita baseada no seu destino e tempo de estadia.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-12 items-start">
+                <!-- Form Area -->
+                <div class="w-full md:w-1/3 bg-white p-8 rounded-2xl shadow-xl border border-slate-100 sticky top-24">
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-brand-dark mb-2">Destino da Viagem</label>
+                            <input type="text" id="packDestination" placeholder="Ex: Ubatuba, Serra Negra..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-blue transition">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-brand-dark mb-2">Duração</label>
+                            <select id="packDuration" class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-blue transition text-slate-600">
+                                <option value="Bate e volta (1 dia)">Bate e volta (1 dia)</option>
+                                <option value="Fim de semana (2-3 dias)">Fim de semana (2-3 dias)</option>
+                                <option value="Feriado prolongado (4-5 dias)">Feriado prolongado (4-5 dias)</option>
+                                <option value="Férias longas (+7 dias)">Férias longas (+7 dias)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="generatePackingList()" id="packBtn" class="w-full bg-brand-dark text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition flex items-center justify-center gap-2 shadow-lg">
+                            <span>Gerar Minha Lista 🎒</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Result Area -->
+                <div class="w-full md:w-2/3">
+                    <div id="packResultContainer" class="bg-white rounded-2xl p-8 shadow-lg min-h-[400px] border border-slate-100 relative">
+                        <!-- Empty State -->
+                        <div id="packEmptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-300">
+                            <i class="fa-solid fa-shirt text-6xl mb-4 opacity-50"></i>
+                            <p class="text-lg font-medium">Sua lista aparecerá aqui</p>
+                        </div>
+
+                        <!-- Loading State -->
+                        <div id="packLoading" class="hidden absolute inset-0 bg-white z-10 flex-col items-center justify-center">
+                            <div class="loader mb-4"></div>
+                            <p class="text-brand-blue font-bold animate-pulse">Organizando a mala...</p>
+                        </div>
+
+                        <!-- Content -->
+                        <div id="packContent" class="hidden">
+                            <h3 class="text-xl font-bold text-brand-blue mb-6 flex items-center gap-2">
+                                <i class="fa-solid fa-clipboard-check"></i> Checklist Sugerido
+                            </h3>
+                            <div id="packListText" class="markdown-prose space-y-4 text-slate-600">
+                                <!-- AI Content goes here -->
+                            </div>
+                            <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+                                <p class="text-xs text-slate-400">Dica: Tire um print desta lista para usar enquanto arruma as malas!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="depoimentos" class="py-24 bg-white">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h4 class="text-brand-blue font-bold uppercase tracking-wider mb-2">Depoimentos</h4>
+                <h2 class="font-heading text-4xl font-bold text-brand-dark">Quem viaja, recomenda</h2>
+                <div class="w-24 h-1 bg-brand-blue mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Depoimento 1 -->
+                <div class="bg-slate-50 p-8 rounded-2xl shadow-lg relative">
+                    <div class="text-brand-blue text-4xl absolute top-4 left-6 opacity-30"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-slate-600 italic mb-6 relative z-10 pt-4">"A viagem para Campos do Jordão foi incrível! A van era super confortável e o motorista muito atencioso. Minha família adorou."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-xl">M</div>
+                        <div>
+                            <h5 class="font-bold text-brand-dark">Maria Silva</h5>
+                            <p class="text-xs text-slate-500">Viagem em Família</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Depoimento 2 -->
+                <div class="bg-slate-50 p-8 rounded-2xl shadow-lg relative">
+                    <div class="text-brand-blue text-4xl absolute top-4 left-6 opacity-30"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-slate-600 italic mb-6 relative z-10 pt-4">"Contratamos a Ata Gaivota para um evento da empresa e foi a melhor escolha. Pontualidade britânica e veículos impecáveis."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-xl">R</div>
+                        <div>
+                            <h5 class="font-bold text-brand-dark">Roberto Mendes</h5>
+                            <p class="text-xs text-slate-500">Fretamento Corporativo</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Depoimento 3 -->
+                <div class="bg-slate-50 p-8 rounded-2xl shadow-lg relative">
+                    <div class="text-brand-blue text-4xl absolute top-4 left-6 opacity-30"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-slate-600 italic mb-6 relative z-10 pt-4">"Fizemos uma excursão para Aparecida e foi tudo perfeito. Recomendo muito para quem busca segurança na estrada."</p>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold text-xl">A</div>
+                        <div>
+                            <h5 class="font-bold text-brand-dark">Ana Paula</h5>
+                            <p class="text-xs text-slate-500">Excursão Religiosa</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="py-24 bg-slate-50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="font-heading text-3xl font-bold text-brand-dark">Momentos Ata Gaivota</h2>
+                <p class="text-slate-600 mt-2">Nossas vans marcando presença em destinos incríveis.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="overflow-hidden rounded-xl shadow-lg h-64 group">
+                    <img src="https://images.unsplash.com/photo-1617788138017-80ad40651399?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Van em cidade histórica" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                </div>
+                <div class="overflow-hidden rounded-xl shadow-lg h-64 group">
+                    <img src="https://images.unsplash.com/photo-1563720223523-491ff04651de?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Van em frente a ponto turístico" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                </div>
+                <div class="overflow-hidden rounded-xl shadow-lg h-64 group">
+                    <img src="https://images.unsplash.com/photo-1562408590-e32931084e23?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Van em fachada urbana" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                </div>
+                <div class="overflow-hidden rounded-xl shadow-lg h-64 group">
+                    <img src="https://images.unsplash.com/photo-1600320254374-ce2d293c324e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Van em cenário urbano" class="w-full h-full object-cover transform group-hover:scale-110 transition duration-500">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Certifications Section (NOVO) -->
+    <section class="bg-white py-10 border-t border-slate-100">
+        <div class="container mx-auto px-6">
+            <p class="text-center text-slate-500 text-sm mb-6 uppercase tracking-widest font-bold">Empresa Certificada e Regularizada</p>
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+                <!-- Using FontAwesome icons as placeholders for official logos like CADASTUR, ANTT, ARTESP -->
+                <div class="flex items-center gap-2" title="Cadastro de Prestadores de Serviços Turísticos">
+                    <i class="fa-solid fa-id-card text-4xl text-brand-dark"></i>
+                    <span class="font-bold text-brand-dark text-xl">CADASTUR</span>
+                </div>
+                <div class="flex items-center gap-2" title="Agência Nacional de Transportes Terrestres">
+                    <i class="fa-solid fa-bus-simple text-4xl text-brand-dark"></i>
+                    <span class="font-bold text-brand-dark text-xl">ANTT</span>
+                </div>
+                <div class="flex items-center gap-2" title="Agência de Transporte do Estado de São Paulo">
+                    <i class="fa-solid fa-road text-4xl text-brand-dark"></i>
+                    <span class="font-bold text-brand-dark text-xl">ARTESP</span>
+                </div>
+                <div class="flex items-center gap-2" title="Seguro de Passageiros Incluso">
+                    <i class="fa-solid fa-file-shield text-4xl text-brand-dark"></i>
+                    <span class="font-bold text-brand-dark text-xl">Seguro APP</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="bg-slate-50 py-16 border-t border-slate-200">
+        <div class="container mx-auto px-6 max-w-3xl">
+            <h3 class="text-2xl font-bold text-brand-dark mb-8 text-center">Dúvidas Frequentes</h3>
+            <div class="space-y-4">
+                <details class="bg-slate-50 rounded-lg shadow-sm group">
+                    <summary class="flex items-center justify-between p-5 cursor-pointer font-bold text-slate-700">
+                        Quais as formas de pagamento?
+                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-5 pt-0 text-slate-600 border-t border-slate-100 mt-2">
+                        Aceitamos cartões de crédito, débito, PIX e transferência bancária. Para excursões, oferecemos parcelamento facilitado.
+                    </div>
+                </details>
+                <details class="bg-slate-50 rounded-lg shadow-sm group">
+                    <summary class="flex items-center justify-between p-5 cursor-pointer font-bold text-slate-700">
+                        Posso levar meu pet na viagem?
+                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-5 pt-0 text-slate-600 border-t border-slate-100 mt-2">
+                        Para viagens fretadas exclusivas, sim, desde que em caixa de transporte adequada. Para excursões compartilhadas, consulte nossa política específica.
+                    </div>
+                </details>
+                <details class="bg-slate-50 rounded-lg shadow-sm group">
+                    <summary class="flex items-center justify-between p-5 cursor-pointer font-bold text-slate-700">
+                        As vans possuem ar-condicionado?
+                        <span class="transition group-open:rotate-180"><i class="fa-solid fa-chevron-down"></i></span>
+                    </summary>
+                    <div class="p-5 pt-0 text-slate-600 border-t border-slate-100 mt-2">
+                        Sim! Toda a nossa frota executiva é equipada com ar-condicionado potente, bancos reclináveis e som ambiente para seu conforto.
+                    </div>
+                </details>
             </div>
         </div>
     </section>
@@ -423,6 +913,43 @@
         </div>
     </footer>
 
+    <!-- Chat Widget -->
+    <div class="chat-widget">
+        <!-- Chat Window -->
+        <div id="chatWindow" class="chat-window">
+            <div class="bg-brand-blue p-4 text-white flex justify-between items-center shadow-md">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm">GaivotaBot</h4>
+                        <p class="text-xs text-blue-100 flex items-center gap-1"><span class="w-2 h-2 bg-green-400 rounded-full inline-block"></span> Online</p>
+                    </div>
+                </div>
+                <button onclick="toggleChat()" class="text-white hover:text-blue-100"><i class="fa-solid fa-times"></i></button>
+            </div>
+            
+            <div id="chatMessages" class="chat-messages">
+                <div class="message bot">
+                    Olá! Sou o assistente virtual da Ata Gaivota. Como posso ajudar você hoje? 🚐✨
+                </div>
+            </div>
+
+            <div class="p-3 bg-white border-t border-slate-100 flex gap-2">
+                <input type="text" id="chatInput" placeholder="Digite sua dúvida..." class="flex-1 bg-slate-100 border-0 rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-brand-blue outline-none" onkeypress="handleEnter(event)">
+                <button onclick="sendChatMessage()" class="bg-brand-blue text-white w-9 h-9 rounded-full flex items-center justify-center hover:bg-blue-600 transition shadow-sm">
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Button -->
+        <button onclick="toggleChat()" class="bg-brand-blue hover:bg-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-2xl transition transform hover:scale-110">
+            <i class="fa-solid fa-comment-dots"></i>
+        </button>
+    </div>
+
     <!-- Scripts -->
     <script>
         // Mobile Menu Toggle
@@ -452,10 +979,11 @@
             }
         });
 
-        // --- Gemini AI Integration ---
+        // --- Gemini AI Integration (Destination Planner) ---
         const apiKey = ""; // Will be provided by environment
 
         async function generateTravelTips() {
+            // ... (Existing Planner Code) ...
             const input = document.getElementById('destinationInput');
             const destination = input.value.trim();
             const generateBtn = document.getElementById('generateBtn');
@@ -508,6 +1036,164 @@
             }
         }
 
+        // --- Gemini AI Packing Assistant (NEW FUNCTION) ---
+        async function generatePackingList() {
+            const destInput = document.getElementById('packDestination');
+            const durInput = document.getElementById('packDuration');
+            const destination = destInput.value.trim();
+            const duration = durInput.value;
+            
+            const btn = document.getElementById('packBtn');
+            const emptyState = document.getElementById('packEmptyState');
+            const loading = document.getElementById('packLoading');
+            const content = document.getElementById('packContent');
+            const listText = document.getElementById('packListText');
+
+            if (!destination) {
+                alert("Por favor, digite o destino da viagem!");
+                return;
+            }
+
+            // UI State
+            btn.disabled = true;
+            btn.innerHTML = '<span>Pensando...</span>';
+            emptyState.classList.add('hidden');
+            content.classList.add('hidden');
+            loading.classList.remove('hidden');
+            loading.style.display = "flex"; // Force flex for centering
+
+            const prompt = `Crie uma lista de bagagem (packing list) otimizada para uma viagem para "${destination}" com duração de "${duration}".
+            O transporte será em van executiva (espaço limitado, bagagem compacta recomendada).
+            
+            Formate a resposta EXATAMENTE com este HTML:
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-bold text-brand-dark mb-2">👕 Roupas & Calçados</h4>
+                    <ul class="list-disc pl-4 space-y-1 text-sm">
+                        <li>[Item 1]</li>
+                        <li>[Item 2]</li>
+                        ...
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-brand-dark mb-2">🧴 Higiene & Saúde</h4>
+                    <ul class="list-disc pl-4 space-y-1 text-sm">
+                        <li>[Item 1]</li>
+                        ...
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-brand-dark mb-2">🔌 Eletrônicos & Docs</h4>
+                    <ul class="list-disc pl-4 space-y-1 text-sm">
+                        <li>[Item 1]</li>
+                        ...
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-brand-dark mb-2">🎒 Essenciais de Van</h4>
+                    <ul class="list-disc pl-4 space-y-1 text-sm">
+                        <li>[Item 1 - Ex: Travesseiro de pescoço]</li>
+                        ...
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-4 text-sm font-bold text-brand-blue">💡 Dica extra sobre o clima local ou item específico para este destino.</p>
+
+            Seja prático e conciso. Não use Markdown, apenas o HTML solicitado.`;
+
+            try {
+                const responseData = await callGeminiWithBackoff(prompt);
+                const text = responseData.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (text) {
+                    listText.innerHTML = text;
+                    loading.classList.add('hidden');
+                    loading.style.display = "none";
+                    content.classList.remove('hidden');
+                } else {
+                    throw new Error("Sem resposta da IA");
+                }
+            } catch (error) {
+                console.error("Erro Packing IA:", error);
+                listText.innerHTML = `<p class="text-red-500 text-center">Não conseguimos gerar a lista agora. Tente novamente!</p>`;
+                loading.classList.add('hidden');
+                loading.style.display = "none";
+                content.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span>Gerar Minha Lista 🎒</span>';
+            }
+        }
+
+        // --- Chatbot Logic ---
+        function toggleChat() {
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.classList.toggle('open');
+            if (chatWindow.classList.contains('open')) {
+                document.getElementById('chatInput').focus();
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            const messagesContainer = document.getElementById('chatMessages');
+
+            if (!text) return;
+
+            // Add User Message
+            appendMessage(text, 'user');
+            input.value = '';
+
+            // Add Typing Indicator
+            const typingId = 'typing-' + Date.now();
+            const typingHtml = `
+                <div id="${typingId}" class="message bot typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            messagesContainer.insertAdjacentHTML('beforeend', typingHtml);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Prepare Prompt
+            const prompt = `Você é o GaivotaBot, assistente virtual amigável e prestativo da Ata Gaivota Turismo.
+            Responda à pergunta do usuário de forma concisa e simpática.
+            Use emojis.
+            Contexto: Somos uma agência de viagens e aluguel de vans executivas em Itanhaém, SP. Fazemos excursões, fretamentos e viagens personalizadas.
+            Usuário disse: "${text}"`;
+
+            try {
+                const responseData = await callGeminiWithBackoff(prompt);
+                const botReply = responseData.candidates?.[0]?.content?.parts?.[0]?.text || "Desculpe, não entendi.";
+                
+                // Remove typing indicator
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.remove();
+
+                appendMessage(botReply, 'bot');
+
+            } catch (error) {
+                const typingEl = document.getElementById(typingId);
+                if (typingEl) typingEl.remove();
+                appendMessage("Ops, tive um problema técnico. Tente novamente!", 'bot');
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            // Convert simple newlines to <br> for chat
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // --- Shared Gemini API Caller ---
         async function callGeminiWithBackoff(prompt) {
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
             const payload = {
