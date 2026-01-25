@@ -1,959 +1,163 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UrbanMove - App de Transporte</title>
-    
-    <!-- React Core -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- UI & Icons -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- Maps (Leaflet - Mapa Real) -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: '#000000',
-                        accent: '#276EF1',
-                        success: '#05944F',
-                        warning: '#F1C40F',
-                        error: '#E11D48',
-                        surface: '#F6F6F6'
-                    },
-                    animation: {
-                        'slide-up': 'slideUp 0.3s ease-out forwards',
-                        'slide-in-right': 'slideInRight 0.3s ease-out forwards',
-                        'fade-in': 'fadeIn 0.3s ease-out forwards',
-                    },
-                    keyframes: {
-                        slideUp: {
-                            '0%': { transform: 'translateY(100%)' },
-                            '100%': { transform: 'translateY(0)' },
-                        },
-                        slideInRight: {
-                            '0%': { transform: 'translateX(100%)' },
-                            '100%': { transform: 'translateX(0)' },
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .leaflet-container { height: 100%; width: 100%; z-index: 0; background: #e5e7eb; }
-        .leaflet-bottom { z-index: 10; } 
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        /* Loader Overlay */
-        .loader-overlay { background: rgba(255,255,255,0.8); backdrop-filter: blur(4px); z-index: 9999; }
-    </style>
+<meta charset="UTF-8">
+<title>Uber Like SPA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:system-ui;background:#000;color:#fff}
+header{padding:15px;background:#000;border-bottom:1px solid #222;text-align:center;font-weight:600}
+.screen{display:none;padding:20px}
+.active{display:block}
+input,button,select{width:100%;padding:14px;margin:8px 0;border-radius:8px;border:none}
+button{background:#1db954;color:#000;font-weight:700}
+button.red{background:#ef4444;color:#fff}
+.card{background:#111;padding:15px;border-radius:12px;margin-bottom:15px}
+.status{padding:12px;background:#1f2933;border-radius:8px;margin-top:10px}
+.small{opacity:.7;font-size:14px}
+</style>
 </head>
-<body class="bg-surface text-gray-900 h-screen overflow-hidden select-none">
-    <div id="root" class="h-full"></div>
+<body>
+
+<header>UBER</header>
+
+<!-- LOGIN -->
+<div id="login" class="screen active">
+  <div class="card">
+    <select id="tipo">
+      <option value="passageiro">Passageiro</option>
+      <option value="motorista">Motorista</option>
+    </select>
+    <input id="nome" placeholder="Seu nome">
+    <button onclick="entrar()">Entrar</button>
+  </div>
+</div>
+
+<!-- PASSAGEIRO -->
+<div id="passageiro" class="screen">
+  <div class="card">
+    <input id="origem" placeholder="Local de embarque">
+    <input id="destino" placeholder="Destino">
+    <button onclick="solicitar()">Solicitar corrida</button>
+  </div>
+  <div class="card">
+    <div id="statusP" class="status">Nenhuma corrida</div>
+    <button class="red" onclick="cancelar()">Cancelar</button>
+  </div>
+</div>
+
+<!-- MOTORISTA -->
+<div id="motorista" class="screen">
+  <div class="card">
+    <button onclick="disponivel()">Ficar disponível</button>
+    <div id="pedido" class="status">Nenhuma solicitação</div>
+    <button onclick="aceitar()">Aceitar</button>
+    <button onclick="iniciar()">Iniciar corrida</button>
+    <button class="red" onclick="finalizar()">Finalizar</button>
+  </div>
+</div>
+
+<script>
+let user=null
+
+function entrar(){
+  const tipo=tipoEl().value
+  const nome=nomeEl().value
+  if(!nome) return alert("Digite seu nome")
+  user={tipo,nome}
+  save("user",user)
+  show(tipo)
+}
+
+function solicitar(){
+  const origem=origemEl().value
+  const destino=destinoEl().value
+  if(!origem||!destino) return alert("Preencha tudo")
+
+  save("corrida",{
+    origem,destino,
+    passageiro:user.nome,
+    motorista:null,
+    status:"procurando",
+    valor:null
+  })
+}
+
+function disponivel(){
+  let c=get("corrida")
+  if(!c||c.status!=="procurando") return
+  c.motorista=user.nome
+  c.status="aceita"
+  save("corrida",c)
+}
+
+function aceitar(){disponivel()}
+
+function iniciar(){
+  let c=get("corrida")
+  if(c&&c.motorista===user.nome){
+    c.status="em_viagem"
+    save("corrida",c)
+  }
+}
+
+function finalizar(){
+  let c=get("corrida")
+  if(!c) return
+  c.status="finalizada"
+  c.valor=(Math.random()*20+15).toFixed(2)
+  save("corrida",c)
+}
+
+function cancelar(){
+  let c=get("corrida")
+  if(c&&c.status==="procurando") localStorage.removeItem("corrida")
+}
+
+function render(){
+  let c=get("corrida")
+  let sp=statusPEl()
+  let pd=pedidoEl()
+
+  if(!c){
+    if(sp) sp.innerText="Nenhuma corrida"
+    if(pd) pd.innerText="Nenhuma solicitação"
+    return
+  }
+
+  if(sp){
+    sp.innerHTML=
+      `Status: ${c.status}<br>
+       Motorista: ${c.motorista||"Procurando"}<br>
+       ${c.valor?`Valor: R$ ${c.valor}`:""}`
+  }
+
+  if(pd){
+    pd.innerHTML=
+      `Passageiro: ${c.passageiro}<br>
+       Origem: ${c.origem}<br>
+       Destino: ${c.destino}<br>
+       Status: ${c.status}`
+  }
+}
+
+function show(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"))
+  el(id).classList.add("active")
+}
+
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function get(k){return JSON.parse(localStorage.getItem(k))}
+function el(id){return document.getElementById(id)}
+function tipoEl(){return el("tipo")}
+function nomeEl(){return el("nome")}
+function origemEl(){return el("origem")}
+function destinoEl(){return el("destino")}
+function statusPEl(){return el("statusP")}
+function pedidoEl(){return el("pedido")}
+
+setInterval(render,800)
+</script>
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef, useContext, createContext, useMemo } = React;
-
-        // ══════════════════════════════════════════════
-        // 0. UTILS (Geocoding & Routing)
-        // ══════════════════════════════════════════════
-        const NOMINATIM_API = "https://nominatim.openstreetmap.org/search";
-        const OSRM_API = "https://router.project-osrm.org/route/v1/driving";
-
-        const getCoordinates = async (address) => {
-            try {
-                const response = await fetch(`${NOMINATIM_API}?format=json&q=${encodeURIComponent(address)}&limit=1`);
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), displayName: data[0].display_name };
-                }
-                return null;
-            } catch (error) {
-                console.error("Geocoding error:", error);
-                return null;
-            }
-        };
-
-        const getRoute = async (start, end) => {
-            try {
-                // OSRM expects: longitude,latitude
-                const url = `${OSRM_API}/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data.code === 'Ok') {
-                    return {
-                        distance: data.routes[0].distance, // meters
-                        duration: data.routes[0].duration, // seconds
-                        geometry: data.routes[0].geometry // GeoJSON
-                    };
-                }
-                return null;
-            } catch (error) {
-                console.error("Routing error:", error);
-                return null;
-            }
-        };
-
-        // ══════════════════════════════════════════════
-        // 1. DATA LAYER
-        // ══════════════════════════════════════════════
-        class Database {
-            constructor() {
-                this.tables = ['users', 'rides', 'messages', 'transactions'];
-                this.init();
-            }
-
-            init() {
-                this.tables.forEach(table => {
-                    if (!localStorage.getItem(`urban_${table}`)) {
-                        localStorage.setItem(`urban_${table}`, JSON.stringify([]));
-                    }
-                });
-                this.seed();
-            }
-
-            seed() {
-                const users = this.select('users');
-                if (users.length === 0) {
-                    this.insert('users', { id: 'p1', type: 'passenger', name: 'João Passageiro', email: 'pax@urban.com', password: '123', balance: 150.00, rating: 4.8 });
-                    this.insert('users', { id: 'd1', type: 'driver', name: 'Maria Motorista', email: 'driver@urban.com', password: '123', balance: 50.00, rating: 4.9, car: 'Toyota Corolla - ABC-1234', status: 'offline', lat: -23.550520, lng: -46.633308 });
-                    this.insert('users', { id: 'a1', type: 'admin', name: 'Admin Master', email: 'admin@urban.com', password: '123', balance: 0 });
-                }
-            }
-
-            select(table, query = {}) {
-                const data = JSON.parse(localStorage.getItem(`urban_${table}`) || '[]');
-                if (Object.keys(query).length === 0) return data;
-                return data.filter(item => Object.keys(query).every(key => item[key] === query[key]));
-            }
-
-            selectOne(table, query) {
-                const results = this.select(table, query);
-                return results.length > 0 ? results[0] : null;
-            }
-
-            insert(table, data) {
-                const list = this.select(table);
-                const newItem = { ...data, id: data.id || Math.random().toString(36).substr(2, 9), createdAt: new Date().toISOString() };
-                list.push(newItem);
-                localStorage.setItem(`urban_${table}`, JSON.stringify(list));
-                return newItem;
-            }
-
-            update(table, id, updates) {
-                const list = this.select(table);
-                const index = list.findIndex(i => i.id === id);
-                if (index !== -1) {
-                    list[index] = { ...list[index], ...updates, updatedAt: new Date().toISOString() };
-                    localStorage.setItem(`urban_${table}`, JSON.stringify(list));
-                    return list[index];
-                }
-                return null;
-            }
-        }
-
-        const db = new Database();
-
-        // ══════════════════════════════════════════════
-        // 2. CONTEXTS
-        // ══════════════════════════════════════════════
-        const AuthContext = createContext(null);
-
-        const AuthProvider = ({ children }) => {
-            const [user, setUser] = useState(null);
-            const [loading, setLoading] = useState(true);
-
-            useEffect(() => {
-                const session = sessionStorage.getItem('urban_session');
-                if (session) {
-                    const userData = db.selectOne('users', { id: session });
-                    if (userData) setUser(userData);
-                }
-                setLoading(false);
-            }, []);
-
-            const login = (email, password) => {
-                const foundUser = db.selectOne('users', { email, password });
-                if (foundUser) {
-                    sessionStorage.setItem('urban_session', foundUser.id);
-                    setUser(foundUser);
-                    return true;
-                }
-                return false;
-            };
-
-            const logout = () => {
-                sessionStorage.removeItem('urban_session');
-                setUser(null);
-            };
-
-            const refreshUser = () => {
-                if (user) {
-                    const freshData = db.selectOne('users', { id: user.id });
-                    setUser(freshData);
-                }
-            }
-
-            return (
-                <AuthContext.Provider value={{ user, login, logout, refreshUser, loading }}>
-                    {children}
-                </AuthContext.Provider>
-            );
-        };
-
-        // ══════════════════════════════════════════════
-        // 3. MAP COMPONENT (LEAFLET + OSRM)
-        // ══════════════════════════════════════════════
-        const MapComponent = ({ userLocation, driverLocation, destination, routeGeoJSON }) => {
-            const mapRef = useRef(null);
-            const mapInstanceRef = useRef(null);
-            const markersRef = useRef({});
-            const routeLayerRef = useRef(null);
-
-            // Init
-            useEffect(() => {
-                if (!mapInstanceRef.current && mapRef.current) {
-                    const map = L.map(mapRef.current, {
-                        zoomControl: false,
-                        attributionControl: false
-                    }).setView([-23.550520, -46.633308], 15);
-
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                        maxZoom: 19
-                    }).addTo(map);
-
-                    mapInstanceRef.current = map;
-                }
-            }, []);
-
-            // Updates
-            useEffect(() => {
-                const map = mapInstanceRef.current;
-                if (!map) return;
-
-                // Icons
-                const userIcon = L.divIcon({
-                    className: 'bg-transparent',
-                    html: `<div class="w-4 h-4 bg-black border-2 border-white rounded-full shadow-lg ring-4 ring-blue-500/30"></div>`
-                });
-
-                const driverIcon = L.divIcon({
-                    className: 'bg-transparent',
-                    html: `<div class="text-2xl drop-shadow-lg">🚗</div>`,
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 15]
-                });
-
-                 const destIcon = L.divIcon({
-                    className: 'bg-transparent',
-                    html: `<div class="text-3xl text-red-600 drop-shadow-md filter drop-shadow-lg">📍</div>`,
-                    iconSize: [30, 30],
-                    iconAnchor: [15, 30]
-                });
-
-                // Clear Logic
-                if (markersRef.current.user) map.removeLayer(markersRef.current.user);
-                if (markersRef.current.driver) map.removeLayer(markersRef.current.driver);
-                if (markersRef.current.dest) map.removeLayer(markersRef.current.dest);
-                if (routeLayerRef.current) map.removeLayer(routeLayerRef.current);
-
-                // Add Markers
-                if (userLocation) {
-                    markersRef.current.user = L.marker(userLocation, { icon: userIcon }).addTo(map);
-                }
-                if (driverLocation) {
-                    markersRef.current.driver = L.marker(driverLocation, { icon: driverIcon }).addTo(map);
-                }
-                if (destination) {
-                    markersRef.current.dest = L.marker(destination, { icon: destIcon }).addTo(map);
-                }
-
-                // Draw Route (Real Geometry)
-                if (routeGeoJSON) {
-                    routeLayerRef.current = L.geoJSON(routeGeoJSON, {
-                        style: { color: 'black', weight: 5, opacity: 0.7, lineCap: 'round' }
-                    }).addTo(map);
-                } else if (userLocation && destination) {
-                    // Fallback to straight line if no OSRM
-                    routeLayerRef.current = L.polyline([userLocation, destination], {
-                        color: 'gray', weight: 4, dashArray: '5, 10'
-                    }).addTo(map);
-                }
-
-                // Fit Bounds
-                const bounds = [];
-                if (userLocation) bounds.push(userLocation);
-                if (driverLocation) bounds.push(driverLocation);
-                if (destination) bounds.push(destination);
-
-                if (bounds.length > 0) {
-                     // If route exists, include it in bounds
-                     if (routeLayerRef.current) {
-                        map.fitBounds(routeLayerRef.current.getBounds(), { padding: [80, 80] });
-                     } else {
-                        map.fitBounds(bounds, { padding: [100, 100], maxZoom: 17 });
-                     }
-                }
-
-            }, [userLocation, driverLocation, destination, routeGeoJSON]);
-
-            return <div ref={mapRef} className="absolute inset-0 z-0" />;
-        };
-
-        // ══════════════════════════════════════════════
-        // 4. UI COMPONENTS
-        // ══════════════════════════════════════════════
-        const Button = ({ children, onClick, variant = 'primary', className = '', disabled = false, loading = false }) => {
-            const base = "w-full py-3 rounded-lg font-semibold transition-all flex justify-center items-center gap-2 shadow-sm active:scale-95";
-            const variants = {
-                primary: "bg-black text-white hover:bg-gray-800 disabled:bg-gray-400",
-                secondary: "bg-white text-gray-800 border border-gray-200 hover:bg-gray-50",
-                danger: "bg-error text-white hover:bg-red-700",
-                success: "bg-success text-white hover:bg-green-700"
-            };
-            
-            return (
-                <button 
-                    onClick={onClick} 
-                    disabled={disabled || loading} 
-                    className={`${base} ${variants[variant]} ${className}`}
-                >
-                    {loading ? <i className="ph ph-spinner animate-spin text-xl"></i> : children}
-                </button>
-            );
-        };
-
-        const Sidebar = ({ isOpen, onClose, user, onLogout, onChangeView }) => {
-            return (
-                <>
-                    {isOpen && <div className="fixed inset-0 bg-black/50 z-40 transition-opacity animate-fade-in" onClick={onClose}></div>}
-                    <div className={`fixed inset-y-0 left-0 w-[85%] max-w-xs bg-white z-50 shadow-2xl transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                        <div className="p-6 bg-black text-white">
-                            <div className="flex justify-between items-start">
-                                <div className="w-16 h-16 bg-gray-700 rounded-full mb-4 flex items-center justify-center text-2xl font-bold border-2 border-white">
-                                    {user.name.charAt(0)}
-                                </div>
-                                <button onClick={onClose} className="text-gray-400 hover:text-white"><i className="ph ph-x text-xl"></i></button>
-                            </div>
-                            <h2 className="text-xl font-bold truncate">{user.name}</h2>
-                            <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                            <div className="mt-4 flex gap-4 text-sm bg-gray-800 p-2 rounded-lg">
-                                <div><span className="font-bold text-yellow-400">5.0 ★</span> Avaliação</div>
-                                <div><span className="font-bold text-green-400">R$ {user.balance.toFixed(2)}</span> Saldo</div>
-                            </div>
-                        </div>
-                        <div className="p-2 space-y-1 mt-2">
-                             <button onClick={() => { onChangeView('history'); onClose(); }} className="w-full text-left p-4 hover:bg-gray-100 rounded-lg flex items-center gap-3 transition-colors">
-                                <i className="ph ph-clock-counter-clockwise text-xl text-gray-500"></i> <span className="font-medium">Histórico</span>
-                            </button>
-                            <button onClick={() => { onChangeView('wallet'); onClose(); }} className="w-full text-left p-4 hover:bg-gray-100 rounded-lg flex items-center gap-3 transition-colors">
-                                <i className="ph ph-wallet text-xl text-gray-500"></i> <span className="font-medium">Carteira</span>
-                            </button>
-                             <button onClick={() => { onChangeView('settings'); onClose(); }} className="w-full text-left p-4 hover:bg-gray-100 rounded-lg flex items-center gap-3 transition-colors">
-                                <i className="ph ph-gear text-xl text-gray-500"></i> <span className="font-medium">Configurações</span>
-                            </button>
-                        </div>
-                        <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-gray-50">
-                            <button onClick={onLogout} className="w-full p-3 text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-3 font-bold justify-center border border-red-100">
-                                <i className="ph ph-sign-out text-xl"></i> Sair
-                            </button>
-                        </div>
-                    </div>
-                </>
-            );
-        };
-
-        // ══════════════════════════════════════════════
-        // 5. SUB-SCREENS (Sidebar Content)
-        // ══════════════════════════════════════════════
-        const HistoryScreen = ({ onBack, userId }) => {
-            const history = db.select('rides', { passengerId: userId }).sort((a,b) => b.timestamp - a.timestamp);
-            return (
-                <div className="absolute inset-0 bg-white z-50 flex flex-col animate-slide-up">
-                    <div className="p-4 border-b flex items-center gap-4 bg-white sticky top-0">
-                        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full"><i className="ph ph-arrow-left text-xl"></i></button>
-                        <h2 className="font-bold text-lg">Suas Viagens</h2>
-                    </div>
-                    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
-                        {history.length === 0 ? <div className="text-center text-gray-400 mt-20">Nenhuma viagem ainda.</div> : 
-                        history.map(ride => (
-                            <div key={ride.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-xs text-gray-500">{new Date(ride.timestamp).toLocaleDateString()} • {new Date(ride.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
-                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${ride.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                        {ride.status === 'completed' ? 'Concluída' : 'Cancelada'}
-                                    </span>
-                                </div>
-                                <div className="flex items-center gap-2 mb-1">
-                                    <div className="w-2 h-2 rounded-full bg-black"></div>
-                                    <p className="text-sm font-medium truncate">{ride.from}</p>
-                                </div>
-                                <div className="flex items-center gap-2 mb-3">
-                                    <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                                    <p className="text-sm font-medium truncate">{ride.to}</p>
-                                </div>
-                                <div className="pt-3 border-t flex justify-between items-center">
-                                    <span className="text-sm text-gray-500">Toyota Corolla</span>
-                                    <span className="font-bold">R$ {ride.price.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        const WalletScreen = ({ onBack, user }) => {
-            return (
-                 <div className="absolute inset-0 bg-white z-50 flex flex-col animate-slide-up">
-                    <div className="p-4 border-b flex items-center gap-4 bg-white">
-                        <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-full"><i className="ph ph-arrow-left text-xl"></i></button>
-                        <h2 className="font-bold text-lg">Carteira</h2>
-                    </div>
-                    <div className="p-6">
-                        <div className="bg-black text-white p-6 rounded-2xl shadow-xl mb-6">
-                            <p className="text-sm text-gray-400 mb-1">Saldo disponível</p>
-                            <h1 className="text-4xl font-bold mb-6">R$ {user.balance.toFixed(2)}</h1>
-                            <Button variant="secondary" className="bg-white/20 border-none text-white hover:bg-white/30" onClick={() => alert("Simulação: Redirecionando para Gateway de Pagamento...")}>
-                                <i className="ph ph-plus"></i> Adicionar Saldo
-                            </Button>
-                        </div>
-                        <h3 className="font-bold text-lg mb-4">Métodos de Pagamento</h3>
-                        <div className="space-y-3">
-                             <div className="flex items-center justify-between p-4 border rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <i className="ph ph-credit-card text-2xl text-gray-600"></i>
-                                    <div>
-                                        <p className="font-bold text-sm">Mastercard •••• 1234</p>
-                                        <p className="text-xs text-gray-400">Expira em 12/28</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center justify-between p-4 border rounded-xl">
-                                <div className="flex items-center gap-3">
-                                    <i className="ph ph-money text-2xl text-green-600"></i>
-                                    <p className="font-bold text-sm">Dinheiro</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // ══════════════════════════════════════════════
-        // 6. MAIN PASSENGER LOGIC
-        // ══════════════════════════════════════════════
-        const PassengerApp = () => {
-            const { user, logout, refreshUser } = useContext(AuthContext);
-            const [view, setView] = useState('home'); 
-            const [subScreen, setSubScreen] = useState(null); // 'history', 'wallet', 'settings'
-            const [sidebarOpen, setSidebarOpen] = useState(false);
-            const [loadingLocation, setLoadingLocation] = useState(false);
-            const [calculating, setCalculating] = useState(false);
-
-            // Ride State
-            const [myLocation, setMyLocation] = useState(null); // [lat, lng]
-            const [destAddress, setDestAddress] = useState('');
-            const [destLocation, setDestLocation] = useState(null);
-            const [rideDetails, setRideDetails] = useState({ distance: 0, price: 0, duration: 0 });
-            const [routeGeoJSON, setRouteGeoJSON] = useState(null);
-            const [currentRide, setCurrentRide] = useState(null);
-            const [driverLocation, setDriverLocation] = useState(null);
-
-            // 1. Get Real Location on Mount
-            useEffect(() => {
-                setLoadingLocation(true);
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(
-                        (pos) => {
-                            setMyLocation([pos.coords.latitude, pos.coords.longitude]);
-                            setLoadingLocation(false);
-                        },
-                        (err) => {
-                            console.error(err);
-                            alert("Erro ao obter localização. Usando padrão (São Paulo).");
-                            setMyLocation([-23.550520, -46.633308]);
-                            setLoadingLocation(false);
-                        },
-                        { enableHighAccuracy: true }
-                    );
-                } else {
-                    setMyLocation([-23.550520, -46.633308]);
-                    setLoadingLocation(false);
-                }
-            }, []);
-
-            // 2. Poll Ride Status
-            useEffect(() => {
-                if (!currentRide) return;
-                const interval = setInterval(() => {
-                    const updatedRide = db.selectOne('rides', { id: currentRide.id });
-                    if (updatedRide) {
-                        setCurrentRide(updatedRide);
-                        if (updatedRide.status === 'accepted' && view === 'searching') setView('accepted');
-                        if (updatedRide.status === 'in_progress' && view === 'accepted') setView('in_progress');
-                        if (updatedRide.status === 'completed' && view === 'in_progress') handleCompletion();
-
-                        if (updatedRide.driverId) {
-                            // Mock movement logic: gradually move driver to dest
-                            // In a real app, driver updates their own location in DB
-                            setDriverLocation(prev => {
-                                if(!prev && myLocation) return [myLocation[0] + 0.005, myLocation[1] + 0.005];
-                                return prev; // Static for now to avoid jitter
-                            });
-                        }
-                    }
-                }, 2000);
-                return () => clearInterval(interval);
-            }, [currentRide, view, myLocation]);
-
-            const handleCompletion = () => {
-                refreshUser();
-                setView('rating');
-                setDriverLocation(null);
-                setDestLocation(null);
-                setRouteGeoJSON(null);
-                setDestAddress('');
-            };
-
-            // 3. Handle Destination Input
-            const handleAddressSubmit = async () => {
-                if (!destAddress) return;
-                setCalculating(true);
-
-                // A. Geocode Destination
-                const destCoords = await getCoordinates(destAddress);
-                if (!destCoords) {
-                    alert("Endereço não encontrado.");
-                    setCalculating(false);
-                    return;
-                }
-                const destLatLon = [destCoords.lat, destCoords.lng];
-                setDestLocation(destLatLon);
-
-                // B. Get Route & Distance
-                const routeData = await getRoute(myLocation, destLatLon);
-                
-                if (routeData) {
-                    const distKm = (routeData.distance / 1000);
-                    // Price Formula: Base R$ 5.00 + (R$ 2.50 * Km)
-                    const price = 5.00 + (distKm * 2.50); 
-                    
-                    setRideDetails({
-                        distance: distKm.toFixed(1),
-                        duration: Math.ceil(routeData.duration / 60),
-                        price: price
-                    });
-                    setRouteGeoJSON(routeData.geometry);
-                    setView('confirming');
-                } else {
-                    alert("Não foi possível traçar a rota.");
-                }
-                setCalculating(false);
-            };
-
-            const requestRide = () => {
-                if (user.balance < rideDetails.price) {
-                    alert("Saldo insuficiente.");
-                    return;
-                }
-                const newRide = db.insert('rides', {
-                    passengerId: user.id,
-                    passengerName: user.name,
-                    driverId: null,
-                    from: "Minha Localização",
-                    to: destAddress, // Should rely on geocoded name
-                    price: rideDetails.price,
-                    distance: rideDetails.distance,
-                    status: 'requested',
-                    timestamp: new Date().getTime()
-                });
-                setCurrentRide(newRide);
-                setView('searching');
-            };
-
-            return (
-                <div className="relative h-full flex flex-col">
-                    {/* Overlays */}
-                    {loadingLocation && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white z-50">
-                            <div className="text-center">
-                                <i className="ph ph-gps-fix text-4xl animate-bounce mb-2"></i>
-                                <p>Obtendo sua localização...</p>
-                            </div>
-                        </div>
-                    )}
-
-                    <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} user={user} onLogout={logout} onChangeView={setSubScreen} />
-                    
-                    {subScreen === 'history' && <HistoryScreen onBack={() => setSubScreen(null)} userId={user.id} />}
-                    {subScreen === 'wallet' && <WalletScreen onBack={() => setSubScreen(null)} user={user} />}
-                    {subScreen === 'settings' && <div className="absolute inset-0 bg-white z-50 p-4"><button onClick={()=>setSubScreen(null)}>Voltar</button> Configurações...</div>}
-
-                    {/* Top Bar */}
-                    <div className="absolute top-4 left-4 right-4 z-20 flex justify-between items-start pointer-events-none">
-                        <button onClick={() => setSidebarOpen(true)} className="bg-white shadow-lg w-10 h-10 rounded-full flex items-center justify-center pointer-events-auto text-gray-700 active:scale-95 transition-transform">
-                            <i className="ph ph-list text-xl"></i>
-                        </button>
-                        {!subScreen && (
-                            <div className="bg-white/90 backdrop-blur shadow-lg px-4 py-2 rounded-full pointer-events-auto">
-                                <span className="font-bold text-sm text-green-700">R$ {user.balance.toFixed(2)}</span>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Main Map */}
-                    <MapComponent 
-                        userLocation={myLocation} 
-                        driverLocation={driverLocation} 
-                        destination={destLocation}
-                        routeGeoJSON={routeGeoJSON}
-                    />
-
-                    {/* Bottom Panels */}
-                    <div className="absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-3xl shadow-[0_-5px_30px_rgba(0,0,0,0.15)] p-6 transition-all duration-300">
-                        
-                        {view === 'home' && (
-                            <div className="animate-slide-up space-y-4">
-                                <h2 className="text-xl font-bold">Para onde vamos?</h2>
-                                <div className="bg-gray-100 p-3 rounded-lg flex items-center gap-3">
-                                    <div className="w-2 h-2 bg-black rounded-full"></div>
-                                    <span className="text-gray-500 text-sm">Minha Localização Atual</span>
-                                </div>
-                                <div className="bg-gray-100 p-3 rounded-lg flex items-center gap-3 border border-transparent focus-within:border-black transition-colors">
-                                    <div className="w-2 h-2 bg-red-500 rounded-sm"></div>
-                                    <input 
-                                        className="bg-transparent w-full outline-none text-sm" 
-                                        placeholder="Digite endereço ou lugar..." 
-                                        value={destAddress}
-                                        onChange={e => setDestAddress(e.target.value)}
-                                        onKeyDown={e => e.key === 'Enter' && handleAddressSubmit()}
-                                    />
-                                    {calculating && <i className="ph ph-spinner animate-spin"></i>}
-                                </div>
-                                <Button onClick={handleAddressSubmit} disabled={!destAddress || calculating}>
-                                    {calculating ? 'Calculando Rota...' : 'Ver Preços'}
-                                </Button>
-                            </div>
-                        )}
-
-                        {view === 'confirming' && (
-                            <div className="animate-slide-up">
-                                <div className="flex justify-between items-center mb-4">
-                                    <div>
-                                        <h2 className="text-xl font-bold">UrbanX</h2>
-                                        <p className="text-xs text-gray-500">~{rideDetails.duration} min • {rideDetails.distance} km</p>
-                                    </div>
-                                    <span className="text-2xl font-bold">R$ {rideDetails.price.toFixed(2)}</span>
-                                </div>
-                                <div className="flex gap-3 mb-4">
-                                    <Button variant="secondary" onClick={() => { setView('home'); setDestLocation(null); setRouteGeoJSON(null); }} className="w-1/3"><i className="ph ph-arrow-left"></i></Button>
-                                    <Button onClick={requestRide} className="w-2/3">Confirmar UrbanX</Button>
-                                </div>
-                            </div>
-                        )}
-
-                        {view === 'searching' && (
-                            <div className="text-center animate-slide-up py-4">
-                                <div className="mb-4 relative h-16 w-16 mx-auto">
-                                    <div className="absolute inset-0 bg-accent opacity-20 rounded-full animate-ping"></div>
-                                    <div className="absolute inset-0 flex items-center justify-center bg-white rounded-full shadow-sm border border-gray-100">
-                                        <i className="ph ph-car text-3xl text-black"></i>
-                                    </div>
-                                </div>
-                                <h3 className="font-bold text-lg mb-1">Buscando motoristas...</h3>
-                                <Button variant="secondary" onClick={() => { 
-                                    db.update('rides', currentRide.id, { status: 'cancelled' });
-                                    setView('home'); 
-                                    setDestLocation(null);
-                                    setRouteGeoJSON(null);
-                                }}>Cancelar</Button>
-                            </div>
-                        )}
-
-                        {(view === 'accepted' || view === 'in_progress') && currentRide && (
-                            <div className="animate-slide-up">
-                                <div className="flex items-center gap-4 mb-4 pb-4 border-b">
-                                    <div className="w-12 h-12 bg-gray-200 rounded-full border-2 border-white shadow-sm flex items-center justify-center font-bold text-lg">
-                                        {db.selectOne('users', { id: currentRide.driverId })?.name.charAt(0)}
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-bold text-lg">{db.selectOne('users', { id: currentRide.driverId })?.name}</h3>
-                                        <p className="text-xs text-gray-500">{db.selectOne('users', { id: currentRide.driverId })?.car}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="text-xs bg-black text-white px-2 py-1 rounded">ABC-1234</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between items-center mb-4">
-                                    <p className="font-bold text-lg">{view === 'accepted' ? 'Motorista a caminho' : 'Em viagem'}</p>
-                                </div>
-                                {view === 'accepted' && (
-                                    <Button variant="danger" className="py-2 text-sm" onClick={() => {
-                                        db.update('rides', currentRide.id, { status: 'cancelled' });
-                                        setView('home');
-                                        setDestLocation(null);
-                                        setRouteGeoJSON(null);
-                                    }}>Cancelar Corrida</Button>
-                                )}
-                            </div>
-                        )}
-
-                        {view === 'rating' && (
-                            <div className="text-center animate-slide-up">
-                                <i className="ph ph-check-circle text-5xl text-success mb-2"></i>
-                                <h2 className="text-xl font-bold">Chegamos!</h2>
-                                <p className="text-gray-500 mb-6">Pagamento realizado.</p>
-                                <Button onClick={() => { setView('home'); setCurrentRide(null); setRideDetails({distance:0, price:0}); }}>Voltar ao Início</Button>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        // ... [DriverApp and LoginScreen remain mostly the same, ensuring context integrity]
-        const DriverApp = () => {
-             const { user, refreshUser, logout } = useContext(AuthContext);
-            const [isOnline, setIsOnline] = useState(false);
-            const [availableRides, setAvailableRides] = useState([]);
-            const [activeRide, setActiveRide] = useState(null);
-
-            // Mock Driver Logic
-            const myLocation = [-23.555, -46.635];
-
-            const toggleStatus = () => {
-                const newStatus = !isOnline;
-                setIsOnline(newStatus);
-                db.update('users', user.id, { status: newStatus ? 'online' : 'offline' });
-                refreshUser();
-            };
-
-            useEffect(() => {
-                let interval;
-                if (isOnline) {
-                    const myActiveRide = db.select('rides').find(r => r.driverId === user.id && ['accepted', 'in_progress'].includes(r.status));
-                    if (myActiveRide) setActiveRide(myActiveRide);
-
-                    interval = setInterval(() => {
-                        if (!activeRide) {
-                            const requests = db.select('rides', { status: 'requested' });
-                            setAvailableRides(requests);
-                        } else {
-                            const freshRide = db.selectOne('rides', { id: activeRide.id });
-                            if (freshRide) setActiveRide(freshRide);
-                            else setActiveRide(null); 
-                        }
-                    }, 2000);
-                } else {
-                    setAvailableRides([]);
-                }
-                return () => clearInterval(interval);
-            }, [isOnline, activeRide]);
-
-            const acceptRide = (rideId) => {
-                const ride = db.selectOne('rides', { id: rideId });
-                if (ride.status !== 'requested') return alert("Já aceita.");
-                const updated = db.update('rides', rideId, { status: 'accepted', driverId: user.id });
-                setActiveRide(updated);
-                setAvailableRides([]);
-            };
-
-            const startRide = () => {
-                db.update('rides', activeRide.id, { status: 'in_progress' });
-                setActiveRide({ ...activeRide, status: 'in_progress' });
-            };
-
-            const finishRide = () => {
-                const ridePrice = activeRide.price;
-                const driverEarnings = ridePrice * 0.80;
-
-                const pax = db.selectOne('users', { id: activeRide.passengerId });
-                db.update('users', pax.id, { balance: pax.balance - ridePrice });
-
-                const driver = db.selectOne('users', { id: user.id });
-                db.update('users', driver.id, { balance: driver.balance + driverEarnings });
-
-                db.update('rides', activeRide.id, { status: 'completed' });
-                setActiveRide(null);
-                refreshUser();
-                alert(`Ganho: R$ ${driverEarnings.toFixed(2)}`);
-            };
-            
-            return (
-                <div className="bg-gray-900 text-white h-full flex flex-col">
-                    <div className="p-4 bg-gray-800 flex justify-between items-center shadow-md z-10">
-                        <div className="flex items-center gap-3">
-                             <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center font-bold">
-                                {user.name.charAt(0)}
-                            </div>
-                            <div>
-                                <h2 className="font-bold text-sm">{user.name}</h2>
-                                <p className="text-[10px] text-gray-400 uppercase tracking-wider">{user.car}</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <h3 className="text-lg font-bold text-green-400">R$ {user.balance.toFixed(2)}</h3>
-                            <button onClick={logout} className="text-xs text-gray-400 hover:text-white underline">Sair</button>
-                        </div>
-                    </div>
-
-                    <div className="flex-1 relative overflow-hidden">
-                        <div className="absolute inset-0 z-0 opacity-40 grayscale invert">
-                            {/* Simple map background for driver for now */}
-                             <div className="w-full h-full bg-gray-700 flex items-center justify-center text-gray-500">Mapa do Motorista</div>
-                        </div>
-
-                        {!activeRide && (
-                            <div className="absolute top-6 left-1/2 transform -translate-x-1/2 z-20 w-full px-10">
-                                <button 
-                                    onClick={toggleStatus}
-                                    className={`w-full py-4 rounded-full font-bold shadow-xl border-4 border-gray-900 transition-all active:scale-95 ${isOnline ? 'bg-green-500 hover:bg-green-400 text-white' : 'bg-red-500 hover:bg-red-400 text-white'}`}
-                                >
-                                    {isOnline ? 'VOCÊ ESTÁ ONLINE' : 'FICAR ONLINE'}
-                                </button>
-                            </div>
-                        )}
-
-                        {isOnline && !activeRide && (
-                            <div className="absolute bottom-0 left-0 right-0 p-4 z-30 space-y-3 pb-8 bg-gradient-to-t from-gray-900 via-gray-900/90 to-transparent pt-20">
-                                {availableRides.length === 0 ? (
-                                    <div className="text-center p-6 text-gray-400 animate-pulse">
-                                        Procurando corridas...
-                                    </div>
-                                ) : (
-                                    availableRides.map(ride => (
-                                        <div key={ride.id} className="bg-white text-gray-900 p-5 rounded-2xl shadow-2xl animate-slide-up border-l-8 border-accent">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <span className="bg-black text-white px-2 py-1 rounded text-xs font-bold">POP</span>
-                                                <h3 className="font-bold text-2xl">R$ {ride.price.toFixed(2)}</h3>
-                                            </div>
-                                            <div className="space-y-3 mb-4 mt-4">
-                                                <div className="flex items-center gap-3">
-                                                    <i className="ph ph-navigation-arrow text-accent text-xl"></i>
-                                                    <div>
-                                                        <p className="text-xs text-gray-500 font-bold uppercase">Distância</p>
-                                                        <p className="font-bold">{ride.distance} km</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <i className="ph ph-map-pin text-red-500 text-xl"></i>
-                                                    <p className="text-sm font-medium truncate">{ride.to}</p>
-                                                </div>
-                                            </div>
-                                            <Button onClick={() => acceptRide(ride.id)} className="w-full bg-accent hover:bg-blue-700 text-white">Aceitar Corrida</Button>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        )}
-
-                        {activeRide && (
-                            <div className="absolute bottom-0 left-0 right-0 bg-white text-gray-900 p-6 rounded-t-3xl z-40 shadow-2xl animate-slide-up">
-                                <div className="flex justify-between items-center border-b pb-4 mb-4">
-                                    <div>
-                                        <h3 className="font-bold text-lg">{activeRide.passengerName}</h3>
-                                        <p className="text-xs text-gray-500 uppercase font-bold text-accent">{activeRide.status === 'accepted' ? 'Buscando Passageiro' : 'Em Rota'}</p>
-                                    </div>
-                                </div>
-                                {activeRide.status === 'accepted' ? (
-                                    <Button onClick={startRide} variant="success" className="h-14 text-lg">Iniciar Viagem</Button>
-                                ) : (
-                                    <Button onClick={finishRide} variant="danger" className="h-14 text-lg">Finalizar Corrida</Button>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        const LoginScreen = () => {
-             const { login } = useContext(AuthContext);
-            const [email, setEmail] = useState('pax@urban.com');
-            const [password, setPassword] = useState('123');
-            const [error, setError] = useState('');
-
-            const handleLogin = (e) => {
-                e.preventDefault();
-                if (!login(email, password)) setError('Usuário não encontrado.');
-            };
-
-            return (
-                <div className="h-full flex flex-col bg-black text-white relative overflow-hidden">
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1494515855673-b411c78e19f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center opacity-40"></div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
-                    
-                    <div className="relative z-10 flex-1 flex flex-col justify-end p-8 pb-12">
-                        <div className="mb-10">
-                            <h1 className="text-5xl font-bold mb-2 tracking-tighter">Urban.</h1>
-                            <p className="text-xl text-gray-300">A cidade em movimento.</p>
-                        </div>
-
-                        <form onSubmit={handleLogin} className="space-y-4 bg-white/10 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                            <input 
-                                type="email" 
-                                value={email} 
-                                onChange={e => setEmail(e.target.value)}
-                                className="w-full p-4 bg-black/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-white outline-none transition-colors"
-                                placeholder="Email"
-                            />
-                            <input 
-                                type="password" 
-                                value={password} 
-                                onChange={e => setPassword(e.target.value)}
-                                className="w-full p-4 bg-black/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:border-white outline-none transition-colors"
-                                placeholder="Senha"
-                            />
-                            {error && <p className="text-red-400 text-sm font-medium">{error}</p>}
-                            <Button className="w-full bg-white text-black hover:bg-gray-200 h-14 text-lg">Acessar Conta</Button>
-                        </form>
-
-                        <div className="mt-8 flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
-                            <span className="px-4 py-2 bg-white/5 rounded-full text-xs text-gray-400 whitespace-nowrap cursor-pointer hover:bg-white/20" onClick={() => {setEmail('pax@urban.com'); setPassword('123')}}>Sou Passageiro</span>
-                            <span className="px-4 py-2 bg-white/5 rounded-full text-xs text-gray-400 whitespace-nowrap cursor-pointer hover:bg-white/20" onClick={() => {setEmail('driver@urban.com'); setPassword('123')}}>Sou Motorista</span>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const MainApp = () => {
-            const { user, loading } = useContext(AuthContext);
-
-            if (loading) return <div className="h-full flex items-center justify-center bg-black text-white"><i className="ph ph-spinner animate-spin text-3xl"></i></div>;
-            if (!user) return <LoginScreen />;
-
-            return (
-                <div className="h-full">
-                    {user.type === 'passenger' && <PassengerApp />}
-                    {user.type === 'driver' && <DriverApp />}
-                    {user.type === 'admin' && <div className="p-10">Painel Admin (Use conta passageiro/motorista)</div>}
-                </div>
-            );
-        };
-
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(
-            <AuthProvider>
-                <MainApp />
-            </AuthProvider>
-        );
-    </script>
 </body>
 </html>
